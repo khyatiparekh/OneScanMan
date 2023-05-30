@@ -41,7 +41,7 @@ def run_nmap(ip_address, output_file, colors, timeout=300):
         return {}
 
 def run_masscan(ip_address, output_file, interface, colors, timeout=300):
-    command = f"sudo /home/kali/Desktop/Enumeration/masscan/bin/masscan {ip_address} -p1-65535,U:1-65535 --wait 0 --rate 1000 -e {interface} > {output_file}"
+    command = f"sudo masscan {ip_address} -p1-65535,U:1-65535 --wait 0 --rate 1000 -e {interface} > {output_file}"
 
     print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports{colors['reset']}\033[0m [{command}]\n")
 
