@@ -3,7 +3,6 @@ Initial network and web application enumeration script for OSCP and Hack The Box
 
 ## Prerequisite:
 - Run the following commands before executing the script:
-    - ``` chmod +x $<project directory>/masscan/bin/masscan ```
     - ``` pip install -r requirements.txt ```
 ## USAGE: 
 - python main.py <IP_ADDRESS_OR_DOMAIN> <OUTPUT_DIRECTORY> <INTERFACE> 
