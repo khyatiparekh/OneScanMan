@@ -317,8 +317,8 @@ def main(target, output_dir, interface):
                     print(smbmap_output)
                    
             # Run Sublist3r for domains
-            if not is_valid_ipv4(target):
-                run_subdomain_scan(target, os.path.join(output_dir, 'subdomains.txt'), colors)
+            #if not is_valid_ipv4(target):
+            #    run_subdomain_scan(target, os.path.join(output_dir, 'subdomains.txt'), colors)
 
             run_nmap(ip_address, open_ports, os.path.join(output_dir, 'nmap'), colors, service_to_port_map)
 
