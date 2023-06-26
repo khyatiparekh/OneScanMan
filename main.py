@@ -232,7 +232,7 @@ def main(target, output_dir, interface):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    ip_address = target if is_valid_ipv4(target) else get_ip_from_domain(target)
+    ip_address = target if is_valid_ipv4(target) else target
 
     if ip_address is None:
         print(f"{colors['red']}[-] Invalid IP address or domain name: {target}{colors['reset']}")
