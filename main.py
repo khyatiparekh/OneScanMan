@@ -14,6 +14,7 @@ from banner_grabbing import banner_grabbing
 from ssl_scan import run_ssl_scan
 from sublist3r import run_subdomain_scan
 from utils import get_ip_from_domain, is_valid_ipv4
+from web_info_gather import web_recon
 import requests
 import urllib3
 
@@ -337,16 +338,20 @@ def main(target, output_dir, interface):
         print(f"\n{colors['red']}Error: {str(e)}{colors['reset']}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 4 and len(sys.argv) > 1:
         if sys.argv[1] and sys.argv[1].lower() == "info":
             display_info()
             sys.exit(1)
-
-        print("Usage: python main.py <IP_ADDRESS_OR_DOMAIN> <OUTPUT_DIRECTORY> <INTERFACE> OR python main.py INFO")
+    elif len(sys.argv) > 1:
+        if sys.argv[1].lower() == "web_recon":
+            web_recon([sys.argv[4]], [sys.argv[2]], [sys.argv[3]])
+            sys.exit(1)
+        elif sys.argv[1].lower() == "enum":
+            target = sys.argv[2]
+            output_dir = f"./Reports/{sys.argv[3]}"
+            print(f"\nReports will be stored in {output_dir}")
+            interface = sys.argv[4]
+            main(target, output_dir, interface)
+    else:
+        print("Usage: \n\n[Enumeration] python main.py enum <IP_ADDRESS_OR_DOMAIN> <OUTPUT_DIRECTORY> <INTERFACE> \n[Information] python main.py INFO\n[Web Basic Info] python main.py web_recon 'all' '<proxy_url>' '<target_urls_with_path>' ----> Example: python main.py web_recon 'all' 'http://localhost:8080' 'http://192.168.20.29 test_path test_path_1'")
         sys.exit(1)
-
-    target = sys.argv[1]
-    output_dir = f"./Reports/{sys.argv[2]}"
-    print(f"\nReports will be stored in {output_dir}")
-    interface = sys.argv[3]
-    main(target, output_dir, interface)
