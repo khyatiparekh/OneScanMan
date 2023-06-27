@@ -2,6 +2,7 @@ import os
 import requests
 import argparse
 import re
+import sys
 from tldextract import extract
 from urlextract import URLExtract
 import urllib3
@@ -20,7 +21,7 @@ colors = {
 # setup requests to use a proxy
 session = requests.Session()
 session.verify = False
-
+session.timeout = 15
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Function to get all hyperlinks and paths from page
@@ -28,13 +29,18 @@ def get_links(url):
     try:
         soup = BeautifulSoup(session.get(url).content, "html.parser")
         for a in soup.findAll('a', href=True):
-            yield a['href']
+            href = a['href']
+            if href and href != "#":
+                yield href
     except Exception as e:
-        print(f"Error fetching links from {url}: {str(e)}")
+        print(f"{colors['red']}[-] Error fetching links from {url}: {str(e)}\n{colors['reset']}")
 
 # Fetch all domains and email ids from webpage
 def fetch_email_and_domain(url):
-    response = session.get(url)
+    try:
+        response = session.get(url)
+    except Exception as e:
+        return [],[]
     encoding = chardet.detect(response.content)['encoding']
     response.encoding = encoding
     text = response.text
@@ -62,15 +68,16 @@ def fetch_email_and_domain(url):
 # Function to run cewl
 def run_cewl(url, ip, path):
    
-    print(f"Command: [cewl -d 3 {url}]\n")
+    print(f"Command: [cewl {url}]\n")
     if path =="/":
         path = ""
 
     try:
-        command = f"cewl -d 3 {url}"
+        command = f"cewl {url}"
         os.system(command)
     except Exception as e:
-        print(f"Error running cewl on {url}: {str(e)}")
+        print(f"{colors['red']}[-] Error running cewl on {url}: {str(e)}\n{colors['reset']}")
+
 
 # Function to fetch and display contents of important files
 def fetch_files(url):
@@ -87,7 +94,10 @@ def fetch_files(url):
 
     for file in files:
         file_url = urljoin(str(url), str(file))
-        response = session.get(file_url)
+        try:
+            response = session.get(file_url)
+        except Exception as e:
+            continue
         if response.status_code == 200:
             yield (file, response.text)
         elif response.status_code != 404:
@@ -100,7 +110,7 @@ def fetch_comments(url):
         comments = soup.find_all(string=lambda text: isinstance(text, Comment))
         yield from comments
     except Exception as e:
-        print(f"Error fetching comments from {url}: {str(e)}")
+        print(f"{colors['red']}[-] Error fetching comments from {url}: {str(e)}\n{colors['reset']}")
 
 # Function to get the IP from the URL
 def get_ip_from_url(url):
@@ -109,30 +119,39 @@ def get_ip_from_url(url):
 
 # Main function
 def web_recon(url_paths, scans, proxy):
-    if proxy:
-        session.proxies = {
-            'http': str(proxy[0]),
-            'https': str(proxy[0]),
-        }
-
     scans = scans[0]
     result = {}
-
     for item in url_paths:
-        matches = re.findall(r'(https?://[^/]+)(?:/([\w\s]+))*', item)
+        matches = re.match(r'(https?://[^/\s]+)(?:\s+([\w\s]+))?', item)
         if matches:
-            url, paths = matches[0]
-            result[url] = result.get(url, []) + [path.strip() for path in paths.split()]
+            url = matches.group(1)
+            paths = matches.group(2)
+            if paths:
+                paths = paths.split()
+            else:
+                paths = []
+            result[url] = result.get(url, []) + paths
 
     for url in result:
         print(f"\n{colors['cyan']}[Target --> URL:{url}]\n{colors['reset']}")
 
         ip = get_ip_from_url(url)
         paths = result[url]
-
         if ip is None:
             continue
 
+        if proxy:
+            session.proxies = {
+                'http': str(proxy),
+                'https': str(proxy),
+            }
+            try:
+                session.get(url)
+            except Exception as e:
+                if "cannot connect to proxy" in str(e).lower():
+                    print(f"{colors['red']}\n[-] Error connecting to proxy\n{colors['reset']}")
+                    sys.exit()
+                
         if "files" in scans or "all" in scans:
             print(f"\n{colors['yellow']}[#] Robot Files for {url}\n{colors['reset']}")
 
@@ -157,7 +176,6 @@ def web_recon(url_paths, scans, proxy):
                     print(f"\n{colors['green']}{links}\n{colors['reset']}")
                 else:
                     print("\n")
-
             if "domains" in scans or "all" in scans:
                 print(f"\n{colors['yellow']}[#] Domains [Possible use: Vhosts]\n{colors['reset']}")
                 emails, domains = fetch_email_and_domain(url_path)
@@ -167,10 +185,6 @@ def web_recon(url_paths, scans, proxy):
                 print(f"\n{colors['green']}Domains/IP:\n{colors['reset']}")
                 for domain in domains:
                     print(f"{domain}")
-            if "cewl" in scans or "all" in scans:
-                print(f"\n{colors['yellow']}[#] Word List\n{colors['reset']}")
-                output["cewl_output"] = run_cewl(url_path, ip, path)
-
             if "comments" in scans or "all" in scans:
                 print(f"\n{colors['yellow']}[#] Comments{colors['reset']}")
 
@@ -180,5 +194,8 @@ def web_recon(url_paths, scans, proxy):
                     print(f"\n{colors['green']}{comments}\n{colors['reset']}")
                 else:
                     print("\n")
+            if "cewl" in scans or "all" in scans:
+                print(f"\n{colors['yellow']}[#] Word List\n{colors['reset']}")
+                output["cewl_output"] = run_cewl(url_path, ip, path)                    
             print(f"{colors['red']}\n-------------------------------URL {url}, Path {path} ends here--------------------------------------\n{colors['reset']}")
 
