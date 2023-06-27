@@ -158,14 +158,14 @@ def get_service_to_port_map(ip_address, open_ports, colors):
     if tcp_ports:
         arguments = "-sV -sT"
         command = f"sudo nmap {ip_address} -p {','.join(tcp_ports)} {arguments}"
-        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['cyan']}TCP {colors['reset']}{colors['yellow']}ports {colors['reset']}\033[0m [{command}]")
+        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['cyan']}TCP {colors['reset']}\033[1m{colors['yellow']}ports\033[0m {colors['reset']}\033[0m [{command}]")
         nm.scan(ip_address, ','.join(tcp_ports), arguments=arguments)
         service_to_port_map, service_banners = collect_services(nm, service_to_port_map, service_banners)
 
     if udp_ports:
         arguments = "-sV -sU"
         command = f"sudo nmap {ip_address} -p {','.join(udp_ports)} {arguments}"
-        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['cyan']}UDP {colors['reset']}{colors['yellow']}ports {colors['reset']}\033[0m [{command}]")
+        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['cyan']}UDP {colors['reset']}\033[1m{colors['yellow']}ports\033[0m {colors['reset']}\033[0m [{command}]")
         nm.scan(ip_address, ','.join(udp_ports), arguments=arguments)
         service_to_port_map, service_banners = collect_services(nm, service_to_port_map, service_banners)
 
