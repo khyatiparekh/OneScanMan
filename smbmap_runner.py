@@ -4,7 +4,7 @@ import os
 def run_smbmap(ip_address, output_dir, colors):
     command = f"sudo smbmap -H {ip_address} > {output_dir}/smbmap_output.txt"
 
-    print(f"\n\033[1m{colors['yellow']}[#] Running smbmap{colors['reset']}\033[0m [{command}]\n")
+    print(f"\n\033[1m{colors['yellow']}[#] Running {colors['cyan']}smbmap{colors['reset']}{colors['reset']}\033[0m [{command}]\n")
 
     try:
         subprocess.run(command, shell=True, check=True)
