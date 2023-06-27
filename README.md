@@ -31,6 +31,42 @@ options:
   -h, --help            show this help message and exit
 ```
 
+Enum
+```
+usage: auto_enum.py enum [-h] --target TARGET --output_dir OUTPUT_DIR --interface INTERFACE
+
+options:
+  -h, --help            show this help message and exit
+  --target TARGET, -t TARGET
+                        Target IP address or domain name
+  --output_dir OUTPUT_DIR, -o OUTPUT_DIR
+                        Directory to store output
+  --interface INTERFACE, -i INTERFACE
+                        Interface to use for scanning
+```
+
+Web Recon
+```
+usage: auto_enum.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] --proxy_url PROXY_URL --target_url TARGET_URL [TARGET_URL ...]
+
+options:
+  -h, --help            show this help message and exit
+  --scan_type SCAN_TYPE [SCAN_TYPE ...], -s SCAN_TYPE [SCAN_TYPE ...]
+                        Type of scan to perform. i.e. All, files, links, domains, cewl, comments
+  --proxy_url PROXY_URL, -p PROXY_URL
+                        Proxy URL
+  --target_url TARGET_URL [TARGET_URL ...], -t TARGET_URL [TARGET_URL ...]
+                        Target URL with paths. Example: http://target.com/path1 and http://target.com/path2 will be "http://target.com path1 path2"
+```
+
+Info
+```
+usage: auto_enum.py info [-h]
+
+options:
+  -h, --help  show this help message and exit
+```
+
 ## Example:
 ```python auto_enum.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
 
