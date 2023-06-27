@@ -26,7 +26,7 @@ def parse_nmap_output(output):
     return open_ports
 
 def run_nmap(ip_address, output_file, colors, timeout=300):
-    command = f"sudo nmap -p- --min-rate 1000 --open -T4 {ip_address} -oN {output_file}"
+    command = f"sudo nmap -p- -sU -sS --min-rate 1000 --open -T4 {ip_address} -oN {output_file}"
     print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports: \033[1m{colors['cyan']}nmap{colors['reset']}\033[0m{colors['reset']}\033[0m [{command}]\n")
 
     try:
