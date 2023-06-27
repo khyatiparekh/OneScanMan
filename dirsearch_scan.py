@@ -40,7 +40,7 @@ def dirsearch_scan(ip_address, port, protocol, output_file, colors, extensions):
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         synchronized_print(f"\n{colors['red']}[-] Dirsearch failed with error code {e.returncode}{colors['reset']}")
-        synchronized_print(f"\n\n\033[1m{colors['yellow']}[>>] Running Gobuster as a backup scanner on {protocol.upper()}...{colors['reset']}\033[0m\n")
+        synchronized_print(f"\n\n\033[1m{colors['yellow']}[>>] Running {colors['yellow']}Gobuster{colors['reset']} as a backup scanner on {protocol.upper()}...{colors['reset']}\033[0m\n")
         return run_gobuster(ip_address, port, protocol, output_file, colors)
 
     try:
@@ -66,7 +66,7 @@ def get_server_type(ip_address, port, protocol):
         return None
 
 def run_dirsearch(ip_address, port, output_dir, colors):
-    print(f"\n\n\033[1m{colors['yellow']}[>>] Running Dirsearch{colors['reset']}\033[0m")
+    print(f"\n\n\033[1m{colors['yellow']}[>>] Running {colors['cyan']}Dirsearch{colors['reset']}{colors['reset']}\033[0m")
 
     os.makedirs(output_dir, exist_ok=True)
 
