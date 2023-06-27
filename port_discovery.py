@@ -27,7 +27,7 @@ def parse_nmap_output(output):
 
 def run_nmap(ip_address, output_file, colors, timeout=300):
     command = f"sudo nmap -p- --min-rate 1000 --open -T4 {ip_address} -oN {output_file}"
-    print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports: nmap{colors['reset']}\033[0m [{command}]\n")
+    print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports: \033[1m{colors['cyan']}nmap{colors['reset']}\033[0m{colors['reset']}\033[0m [{command}]\n")
 
     try:
         output = subprocess.check_output(command, shell=True, text=True, timeout=timeout)
@@ -47,7 +47,7 @@ def run_port_discovery(ip_address, output_file, interface, colors, timeout=300):
     else:
         return run_nmap(ip_address, nmap_output_file, colors)
 
-    print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports: masscan{colors['reset']}\033[0m [{command}]\n")
+    print(f"\n\n\033[1m{colors['yellow']}[#] Discovering open Ports: \033[1m{colors['cyan']}masscan{colors['reset']}\033[0m{colors['reset']}\033[0m [{command}]\n")
 
     command = f"sudo masscan {ip_address} -p1-65535,U:1-65535 --wait 0 --rate 1000 -e {interface} > {output_file}"
 
