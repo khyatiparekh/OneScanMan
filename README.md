@@ -1,4 +1,4 @@
-# AutoEnum
+# OneScanMan
 All it takes is one normal scan. (Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.)
 
 ## Setup Virtual Environment
