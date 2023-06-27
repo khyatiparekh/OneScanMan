@@ -1,5 +1,5 @@
 # AutoEnum
-All it takes is one serious scan. (Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.)
+All it takes is one normal scan. (Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.)
 
 ## Setup Virtual Environment
 ### Install virtualenv
