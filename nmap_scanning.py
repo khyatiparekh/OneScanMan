@@ -233,7 +233,7 @@ def run_nmap(ip_address, open_ports, output_dir, colors, service_to_port_map):
                     f.write(output)
                     f.write("\n\n\n" + "=" * 80 + "\n\n")
 
-            print(f"{colors['green']}\r\x1b[K[\u2713] Completed:{colors['reset']} Port {port}, Scripts {scripts}")
+            print(f"{colors['green']}\r\x1b[K[\u2713] Completed:{colors['reset']} Port {colors['cyan']}{port}{colors['reset']}, Scripts {scripts}")
 
     stop_animation_event.set()
     animation_thread.join()
