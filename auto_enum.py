@@ -150,13 +150,13 @@ def main(args):
             # Banner grabbing for all open ports
             banners = grab_banners_concurrently(ip_address, open_ports, colors, all_websites)
 
-            print(f"{colors['yellow']}[*] Method 1 output [{colors['cyan']}http.client/netcat{colors['reset']}]:{colors['reset']}")
+            print(f"{colors['yellow']}[*] Method 1 output [{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}]:{colors['reset']}")
             for banner in banners:
                 print(banner)
 
-            print(f"\n{colors['yellow']}[*] Method 2 output [{colors['cyan']}nmap{colors['reset']}]:{colors['reset']}")
+            print(f"\n{colors['yellow']}[*] Method 2 output [{colors['cyan']}nmap{colors['reset']}{colors['yellow']}]:{colors['reset']}")
             for ports in service_banners:
-                print(f"{colors['green']}[\u2713] Banner for port {colors['cyan']}{ports}{colors['reset']}:{colors['reset']} {service_banners[ports]}")
+                print(f"{colors['green']}[\u2713] Banner for port {colors['cyan']}{ports}{colors['reset']}{colors['yellow']}:{colors['reset']} {service_banners[ports]}")
 
             service_names = list(service_to_port_map.keys())
 
