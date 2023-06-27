@@ -16,12 +16,26 @@ Initial network and web application enumeration script for OSCP and Hack The Box
     - ``` pip install -r requirements.txt ```
     
 ## USAGE: 
-- [Enumeration] ```python main.py enum <IP_ADDRESS_OR_DOMAIN> <OUTPUT_DIRECTORY> <INTERFACE> ```
-- [Information] ```python main.py INFO``` 
-- [Web Recon] ```python main.py web_recon 'all' '<proxy_url>' '<target_urls_with_path>'``` 
-     - Example: ``` python main.py web_recon 'all' 'http://localhost:8080' 'http://192.168.20.29 test_path test_path_1'``` 
+```
+usage: aatank.py [-h] {enum,web_recon,info} ...
+
+Script for web reconnaissance and enumeration.
+
+positional arguments:
+  {enum,web_recon,info}
+    enum                Perform enumeration.
+    web_recon           Perform web reconnaissance.
+    info                Display information of important tools
+
+options:
+  -h, --help            show this help message and exit
+```
 
 ## Example:
-``` python main.py 10.129.23.55 scan_name tun0 ``` 
+```python aatank.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
+
+```python aatank.py info```
+
+```python aatank.py web_recon -s All -p http://localhost:8080 -u "http://192.168.203.50 test1 test2"'``` 
 
 
