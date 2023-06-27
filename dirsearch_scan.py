@@ -34,7 +34,7 @@ def run_gobuster(ip_address, port, protocol, output_file, colors):
     return True
 
 def dirsearch_scan(ip_address, port, protocol, output_file, colors, extensions):
-    command = f"sudo dirsearch -u {protocol}://{ip_address}:{port} -e {extensions} -o {output_file} -format plain --timeout=5 --retries=2"
+    command = f"sudo dirsearch -u {protocol}://{ip_address}:{port} -e {extensions} -format plain --timeout=5 --retries=2"
     try:
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
@@ -42,8 +42,16 @@ def dirsearch_scan(ip_address, port, protocol, output_file, colors, extensions):
         synchronized_print(f"\n\n\033[1m{colors['yellow']}[>>] Running Gobuster as a backup scanner on {protocol.upper()}...{colors['reset']}\033[0m\n")
         return run_gobuster(ip_address, port, protocol, output_file, colors)
 
-    with open(output_file, 'r') as f:
-        synchronized_print(f.read())
+    try:
+        # default directory where dirsearch stores results
+        src_file = "/usr/lib/python3/dist-packages/dirsearch/rmat"
+        # Check if the source file exists
+        if os.path.isfile(src_file):
+            shutil.copy(src_file, output_file)
+        else:
+            print(f"{colors['red']}[-] Source file {src_file} does not exist{colors['reset']}")
+    except Exception as e:
+        print(f"{colors['red']}[-] Error storing file in {output_file}:{e}{colors['reset']}")
 
     return True
 
@@ -75,7 +83,7 @@ def run_dirsearch(ip_address, port, output_dir, colors):
 
                 # Customize extensions based on server type
                 if server and "apache" in server.lower() or "nginx" in server.lower():
-                    extensions = "js,txt,html,php,php3,php4,php5,php7,phtml"  # Example for Apache servers
+                    extensions = "js,txt,html,php,php3,php4,php5,php7,phtml"
                 elif server and "iis" in server.lower():
                     extensions = "js,txt,html,cs,dll,config,cshtml,asp,net,asax,aspx,ascx,ashx,asmx,axd,asp"
                 elif server and "python" in server.lower():
@@ -96,3 +104,4 @@ def run_dirsearch(ip_address, port, output_dir, colors):
                 future.result()
             except Exception as e:
                 synchronized_print(f"{colors['red']}[-] An error occurred while scanning: {e}{colors['reset']}")
+        
