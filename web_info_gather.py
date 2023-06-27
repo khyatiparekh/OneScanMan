@@ -122,6 +122,9 @@ def web_recon(url_paths, scans, proxy):
     scans = scans[0]
     result = {}
     for item in url_paths:
+        if item.strip().startswith("http") == False:
+            item = "http://" + item
+
         matches = re.match(r'(https?://[^/\s]+)(?:\s+([\w\s]+))?', item)
         if matches:
             url = matches.group(1)
@@ -151,7 +154,7 @@ def web_recon(url_paths, scans, proxy):
                 if "cannot connect to proxy" in str(e).lower():
                     print(f"{colors['red']}\n[-] Error connecting to proxy\n{colors['reset']}")
                     sys.exit()
-                
+
         if "files" in scans or "all" in scans:
             print(f"\n{colors['yellow']}[#] Robot Files for {url}\n{colors['reset']}")
 
