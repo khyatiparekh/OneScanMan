@@ -1,5 +1,5 @@
 # AutoEnum
-Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.
+All it takes is one serious scan. (Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.)
 
 ## Setup Virtual Environment
 ### Install virtualenv
@@ -17,7 +17,7 @@ Initial network enumeration script for CTFs. Created with HTB and OSCP in mind.
     
 ## USAGE: 
 ```
-usage: auto_enum.py [-h] {enum,web_recon,info} ...
+usage: one_scan_man.py [-h] {enum,web_recon,info} ...
 
 Script for web reconnaissance and enumeration.
 
@@ -33,7 +33,7 @@ options:
 
 Enum
 ```
-usage: auto_enum.py enum [-h] --target TARGET --output_dir OUTPUT_DIR --interface INTERFACE
+usage: one_scan_man.py enum [-h] --target TARGET --output_dir OUTPUT_DIR --interface INTERFACE
 
 options:
   -h, --help            show this help message and exit
@@ -47,7 +47,7 @@ options:
 
 Web Recon
 ```
-usage: auto_enum.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] --proxy_url PROXY_URL --target_url TARGET_URL [TARGET_URL ...]
+usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] --proxy_url PROXY_URL --target_url TARGET_URL [TARGET_URL ...]
 
 options:
   -h, --help            show this help message and exit
@@ -61,18 +61,18 @@ options:
 
 Info
 ```
-usage: auto_enum.py info [-h]
+usage: one_scan_man.py info [-h]
 
 options:
   -h, --help  show this help message and exit
 ```
 
 ## Example:
-```python auto_enum.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
+```python one_scan_man.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
 
-```python auto_enum.py web_recon -s All -p http://localhost:8080 -u "http://192.168.203.50 test1 test2"'``` 
+```python one_scan_man.py web_recon -s All -p http://localhost:8080 -u "http://192.168.203.50 test1 test2"'``` 
 
-```python auto_enum.py info```
+```python one_scan_man.py info```
 
 
 
