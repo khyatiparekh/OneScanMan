@@ -84,7 +84,7 @@ def check_http(ip_address, port):
 def check_https(ip_address, port):
     try:
         if is_website_up(ip_address, port, 'https'):
-            print(f"{colors['green']}[\u2713] Webserver Detected:{colors['reset']} -https- {port}")
+            print(f"{colors['green']}[\u2713] Webserver Detected:{colors['reset']} {colors['cyan']}-https-{colors['reset']} {port}")
             return (port, "ssl")
     except Exception as e:
         pass
@@ -130,7 +130,7 @@ def main(args):
 
             all_websites = {}
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                print(f"\n\033[1m{colors['yellow']}[#] Checking for webservers {colors['reset']}\033[0m\n")
+                print(f"\n\033[1m{colors['yellow']}[#] Checking for {colors['yellow']}webservers{colors['reset']} {colors['reset']}\033[0m\n")
 
                 futures_http = {executor.submit(check_http, ip_address, port): port for port in open_ports}
                 futures_https = {executor.submit(check_https, ip_address, port): port for port in open_ports}
