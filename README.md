@@ -1,4 +1,4 @@
-# OSCP Enumeration Script
+# AutoEnum
 Initial network and web application enumeration script for OSCP and Hack The Box
 
 ## Setup Virtual Environment
