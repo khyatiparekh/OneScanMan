@@ -39,7 +39,6 @@ def display_info():
     print(f"\n{colors['cyan']}[#] Tools of importance\n{colors['reset']}")
     print("-----------------------------------------------------------------------------------------------------------------")
 
- 
     for sections in all_tools:
         print(f"\n{colors['cyan']}", sections, f"{colors['reset']}")
 
@@ -113,7 +112,7 @@ def main(args):
         print(f"{colors['red']}[-] Invalid IP address or domain name: {target}{colors['reset']}")
         sys.exit(1)
 
-    print(f"\n\n\033[1m{colors['yellow']}[--------] Scanning IP:{colors['reset']}\033[0m \033[1m{colors['cyan']}{ip_address}{colors['reset']}\033[0m \033[1m{colors['yellow']}[--------]{colors['reset']}\033[0m\n")
+    print(f"\n\n\033[1m{colors['yellow']}[--------] Scanning IP:{colors['reset']}\033[0m \033[1m{colors['cyan']}{ip_address}{colors['reset']}\033[0m \033[1m{colors['yellow']}[--------]{colors['reset']}\033[0m")
 
     try:
         ports_and_protocol = run_port_discovery(ip_address, os.path.join(output_dir, 'masscan.txt'), interface, colors)
@@ -151,11 +150,11 @@ def main(args):
             # Banner grabbing for all open ports
             banners = grab_banners_concurrently(ip_address, open_ports, colors, all_websites)
 
-            print(f"{colors['yellow']}[*] Method 1 output:{colors['reset']}")
+            print(f"{colors['yellow']}[*] Method 1 output [http.client/netcat]:{colors['reset']}")
             for banner in banners:
                 print(banner)
 
-            print(f"\n{colors['yellow']}[*] Method 2 output:{colors['reset']}")
+            print(f"\n{colors['yellow']}[*] Method 2 output [nmap]:{colors['reset']}")
             for ports in service_banners:
                 print(f"{colors['green']}[\u2713] Banner for port {ports}:{colors['reset']} {service_banners[ports]}")
 
