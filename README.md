@@ -17,7 +17,7 @@ Initial network and web application enumeration script for OSCP and Hack The Box
     
 ## USAGE: 
 ```
-usage: aatank.py [-h] {enum,web_recon,info} ...
+usage: auto_enum.py [-h] {enum,web_recon,info} ...
 
 Script for web reconnaissance and enumeration.
 
@@ -32,10 +32,10 @@ options:
 ```
 
 ## Example:
-```python aatank.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
+```python auto_enum.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
 
-```python aatank.py info```
+```python auto_enum.py info```
 
-```python aatank.py web_recon -s All -p http://localhost:8080 -u "http://192.168.203.50 test1 test2"'``` 
+```python auto_enum.py web_recon -s All -p http://localhost:8080 -u "http://192.168.203.50 test1 test2"'``` 
 
 
