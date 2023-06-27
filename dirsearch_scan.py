@@ -5,6 +5,7 @@ import requests
 from requests.exceptions import RequestException
 import concurrent.futures
 import threading
+import shutil
 
 print_lock = threading.Lock()
 
