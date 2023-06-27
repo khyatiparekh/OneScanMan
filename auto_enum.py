@@ -241,6 +241,8 @@ def main(args):
         print(f"{colors['red']}[-] Invalid IP address or domain name: {target}{colors['reset']}")
         sys.exit(1)
 
+    print(f"\n\n\033[1m{colors['yellow']}[--------] Scanning IP:{colors['reset']}\033[0m \033[1m{colors['cyan']}{ip_address}{colors['reset']}\033[0m \033[1m{colors['yellow']}[--------]{colors['reset']}\033[0m\n")
+
     try:
         ports_and_protocol = run_port_discovery(ip_address, os.path.join(output_dir, 'masscan.txt'), interface, colors)
 
@@ -321,7 +323,7 @@ def main(args):
                    
             # Add fuff for finding vhosts here [Bruteforce]
 
-            run_nmap(ip_address, open_ports, os.path.join(output_dir, 'nmap'), colors, service_to_port_map)
+            run_nmap(ip_address, open_ports, os.path.join(output_dir, 'nmap_scripts'), colors, service_to_port_map)
 
             scan_services(ip_address, service_to_port_map, output_dir, colors)
 
