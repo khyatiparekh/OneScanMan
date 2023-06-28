@@ -122,6 +122,7 @@ def web_recon(url_paths, scans, proxy):
     scans = scans[0]
     result = {}
     for item in url_paths:
+        # If protocol not provided, assume its http
         if item.strip().startswith("http") == False:
             item = "http://" + item
 
@@ -151,8 +152,8 @@ def web_recon(url_paths, scans, proxy):
             try:
                 session.get(url)
             except Exception as e:
-                if "cannot connect to proxy" in str(e).lower():
-                    print(f"{colors['red']}\n[-] Error connecting to proxy\n{colors['reset']}")
+                if "cannot connect to proxy" in str(e).lower() or "not supported proxy scheme" in str(e).lower():
+                    print(f"{colors['red']}\n[-] Error connecting to proxy. Please use following format: (protocol)://(domain):(port)\n{colors['reset']}")
                     sys.exit()
 
         if "files" in scans or "all" in scans:
@@ -201,4 +202,3 @@ def web_recon(url_paths, scans, proxy):
                 print(f"\n{colors['yellow']}[#] Word List\n{colors['reset']}")
                 output["cewl_output"] = run_cewl(url_path, ip, path)                    
             print(f"{colors['red']}\n-------------------------------URL {url}, Path {path} ends here--------------------------------------\n{colors['reset']}")
-
