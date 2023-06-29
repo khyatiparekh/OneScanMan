@@ -27,8 +27,13 @@ def get_http_headers(ip_address, port, service):
         headers = response.getheaders()
         conn.close()
 
-        return "\n".join([f"{header[0]}: {header[1]}" for header in headers])
+        header_return = ""
+        for header in headers:
+            if "server" in header[0].lower():
+                return (header[1],)
+        return headers
     except Exception as e:
+        print(e)
         return None
 
 def banner_grabbing(ip_address, port, colors, services):
@@ -38,7 +43,6 @@ def banner_grabbing(ip_address, port, colors, services):
         else:
             with socket.create_connection((ip_address, port), timeout=10) as sock:
                 banner = sock.recv(4096).decode(errors='replace')
-        return banner.strip()
+        return banner
     except Exception as e:
         return banner_grabbing_netcat(ip_address, port, 10)
-
