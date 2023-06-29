@@ -9,6 +9,7 @@ import urllib3
 import chardet
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup, Comment
+from banner_grabbing import banner_grabbing
 
 colors = {
     'red': '\033[91m',
@@ -198,6 +199,36 @@ def web_recon(url_paths, scans, proxy):
                     print(f"\n{colors['green']}{comments}\n{colors['reset']}")
                 else:
                     print("\n")
+            if "banner" in scans or "all" in scans:
+                result = urlparse(url)
+
+                if result.scheme != None:
+                    scheme = str(result.scheme)
+                if result.port != None:
+                    port = str(result.port)
+
+                if "https" in url and result.port == None:
+                    scheme = "https"
+                    port = "443"
+                    services = {port: 'https'}
+                elif "http" in url and result.port == None:
+                    scheme = "http"
+                    port = "80"
+                    services = {port: 'http'}
+                else:
+                    if result.scheme == None:
+                        scheme = "http"
+                    if result.port == None:
+                        port = "80" 
+                    services = {port: scheme}
+
+                services = {port:scheme}
+                banner_result = banner_grabbing(ip, port, colors, services)
+
+                print(f"{colors['yellow']}[*] Server Banner [{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}]:{colors['reset']}")
+                for banner in banner_result:
+                    print(banner)
+
             if "cewl" in scans or "all" in scans:
                 print(f"\n{colors['yellow']}[#] Word List\n{colors['reset']}")
                 output["cewl_output"] = run_cewl(url_path, ip, path)                    
