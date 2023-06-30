@@ -64,14 +64,3 @@ def download_files(ip_address, output_dir, share_name, colors):
     except:
         return
 
-
-
-colors = {
-    'red': '\033[91m',
-    'green': '\033[92m',
-    'yellow': '\033[93m',
-    'cyan': '\033[96m',
-    'reset': '\033[0m'
-}
-
-run_smbmap("192.168.186.10", "./Reports/192.168.186.10", colors)
