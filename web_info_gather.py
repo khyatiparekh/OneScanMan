@@ -127,7 +127,7 @@ def web_recon(url_paths, scans, proxy):
         if item.strip().startswith("http") == False:
             item = "http://" + item
 
-        matches = re.match(r'(https?://[^/\s]+)(?:\s+([\w\s]+))?', item)
+        matches = re.match(r'(https?://[^/\s]+)(?:\s+(.*))?', item)
         if matches:
             url = matches.group(1)
             paths = matches.group(2)
