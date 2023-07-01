@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import sys
 import queue
@@ -6,6 +7,7 @@ from smbmap_runner import run_smbmap
 import concurrent.futures
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from port_discovery import run_port_discovery
 from nmap_scanning import run_nmap, get_service_to_port_map
 from dirsearch_scan import run_dirsearch
@@ -48,13 +50,16 @@ def display_info():
 def grab_banner_for_port(args):
     ip_address, port, colors, all_websites = args
     banner = banner_grabbing(ip_address, port, colors, all_websites)
-    if banner:
-        return f"{colors['green']}[\u2713] Banner for port {port}:{colors['reset']} {banner}"
+    if banner != None and len(banner) > 0:
+        if isinstance(banner, tuple) and len(banner) == 1:
+            banner = banner[0]
+        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{banner.strip()}]"
     else:
-        return f"{colors['red']}[-] No banner received for{colors['reset']} port {port}"
+        banner = "Banner not found"
+        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{colors['red']}{banner.strip()}{colors['reset']}]"
 
 def grab_banners_concurrently(ip_address, open_ports, colors, all_websites, max_workers=10):
-    print(f"\n\033[1m{colors['yellow']}[#] Banner Grabbing{colors['reset']}\033[0m\n")
+    #print(f"\n\033[1m{colors['yellow']}[Banner Discovery]{colors['reset']}\033[0m\n")
 
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -71,11 +76,11 @@ def is_website_up(ip_address, port, protocol):
         return True
     except Exception as e:
         return False
-   
+
 def check_http(ip_address, port):
     try:
         if is_website_up(ip_address, port, 'http'):
-            print(f"{colors['green']}[\u2713] Webserver Detected:{colors['reset']} -http- {port}")
+            print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Discovery][{colors['cyan']}Webserver{colors['yellow']}]{colors['reset']}[HTTP][{port}]")
             return (port, "http")
     except Exception as e:
         pass
@@ -84,7 +89,7 @@ def check_http(ip_address, port):
 def check_https(ip_address, port):
     try:
         if is_website_up(ip_address, port, 'https'):
-            print(f"{colors['green']}[\u2713] Webserver Detected:{colors['reset']} {colors['cyan']}-https-{colors['reset']} {port}")
+            print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Discovery][{colors['cyan']}Webserver{colors['yellow']}]{colors['reset']}[HTTPS][{port}]")
             return (port, "ssl")
     except Exception as e:
         pass
@@ -94,28 +99,26 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors):
 
     for service in ('http', 'ssl'):
         if service in service_to_port_map:
+            if service in 'http':
+                web_recon('http://'+ip_address, ['banner,comments,domains,links,files'], 'None')
+            elif service in 'ssl':
+                web_recon('https://'+ip_address, ['banner,comments,domains,links,files'], 'None')
+
+            # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
                 run_dirsearch(ip_address, port, output_dir, colors)
 
-def main(args):
-    target = args.target
+def main(scan_type, args):
     output_dir = "./Reports/" + str(args.output_dir)
+    target = args.target
     interface = args.interface
-       
+    scan_type_u = scan_type.upper()
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    ip_address = target if is_valid_ipv4(target) else target
-    ip_address = target
-    if ip_address is None:
-        print(f"{colors['red']}[-] Invalid IP address or domain name: {target}{colors['reset']}")
-        sys.exit(1)
-
-    print(f"\n\n\033[1m{colors['yellow']}[--------] Scanning IP:{colors['reset']}\033[0m \033[1m{colors['cyan']}{ip_address}{colors['reset']}\033[0m \033[1m{colors['yellow']}[--------]{colors['reset']}\033[0m")
-
     try:
-        ports_and_protocol = run_port_discovery(ip_address, os.path.join(output_dir, 'masscan.txt'), interface, colors)
+        ports_and_protocol = run_port_discovery(ip_address, os.path.join(output_dir, 'masscan.txt'), interface, colors, scan_type)
 
         open_ports = []
         protocols = {}
@@ -124,13 +127,13 @@ def main(args):
             open_ports.append(port)
             protocols[port] = protocol
 
-        if open_ports:
+        if open_ports and scan_type != "os":
             open_ports_str = ', '.join(f"{port}/{protocol}" for port, protocol in protocols.items())
-            print(f"{colors['green']}[\u2713] Discovered open ports:{colors['reset']} {open_ports_str}")
+            print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}]{colors['reset']}[{open_ports_str}]")
 
             all_websites = {}
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                print(f"\n\033[1m{colors['yellow']}[#] Checking for {colors['yellow']}webservers{colors['reset']} {colors['reset']}\033[0m\n")
+                #print(f"\033[1m{colors['yellow']}[Web Discovery]{colors['yellow']}[Webservers]{colors['reset']}{colors['reset']}\033[0m")
 
                 futures_http = {executor.submit(check_http, ip_address, port): port for port in open_ports}
                 futures_https = {executor.submit(check_https, ip_address, port): port for port in open_ports}
@@ -150,13 +153,18 @@ def main(args):
             # Banner grabbing for all open ports
             banners = grab_banners_concurrently(ip_address, open_ports, colors, all_websites)
 
-            print(f"{colors['yellow']}[*] Method 1 output [{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}]:{colors['reset']}")
+            #print(f"{colors['yellow']}[Banner][{scan_type_u}][{colors['cyan']}http.client/socket/netcat{colors['yellow']}]{colors['reset']}")
             for banner in banners:
-                print(banner)
+                if banner != None:
+                    print(banner)
 
-            print(f"\n{colors['yellow']}[*] Method 2 output [{colors['cyan']}nmap{colors['reset']}{colors['yellow']}]:{colors['reset']}")
+            #print(f"{colors['yellow']}[Banner][{scan_type_u}][{colors['cyan']}nmap{colors['yellow']}]{colors['reset']}")
             for ports in service_banners:
-                print(f"{colors['green']}[\u2713] Banner for port {colors['cyan']}{ports}{colors['reset']}{colors['yellow']}:{colors['reset']} {service_banners[ports]}")
+                if len(service_banners[ports]) == 0:
+                    service_banners[ports] = "Banner not found"
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['red']}{service_banners[ports].strip()}{colors['reset']}]")
+                else:
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{service_banners[ports].strip()}]")
 
             service_names = list(service_to_port_map.keys())
 
@@ -180,7 +188,7 @@ def main(args):
 
                     if port in all_websites:
                         service = all_websites[port]
-                       
+
             service_to_port_map = {service: list(set(ports)) for service, ports in service_to_port_map.items()}
 
             # Run smbmap if the service is netbios-ssn or microsoft-ds
@@ -191,10 +199,13 @@ def main(args):
                     with open(os.path.join(output_dir, "smbmap_output.txt"), 'w') as f:
                         f.write(smbmap_output)
                     print(smbmap_output)
-                   
-            # Add fuff for finding vhosts here [Bruteforce]
+
+            # Add ffuf for finding vhosts here [Bruteforce]
 
             run_nmap(ip_address, open_ports, os.path.join(output_dir, 'nmap_scripts'), colors, service_to_port_map)
+
+            if scan_type == "udp":
+                return
 
             scan_services(ip_address, service_to_port_map, output_dir, colors)
 
@@ -205,10 +216,11 @@ def main(args):
                         run_nikto(ip_address, port, os.path.join(output_dir, f'nikto_port_{port}.txt'), colors)
 
         else:
-            print(f"{colors['red']}[-] No open ports detected on {target}{colors['reset']}")
+            if scan_type != "os" and scan_type != "udp":
+                print(f"{colors['red']}[Failure][{scan_type_u}][No open ports detected on {target}]{colors['reset']}")
 
     except Exception as e:
-        print(f"\n{colors['red']}Error: {str(e)}{colors['reset']}")
+        print(f"{colors['red']}[Failure][{scan_type_u}][{str(e)}]{colors['reset']}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Script for web reconnaissance and enumeration.')
@@ -222,7 +234,7 @@ if __name__ == "__main__":
 
     web_recon_parser = subparsers.add_parser('web_recon', help='Perform web reconnaissance')
     web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform. i.e. All, files, links, domains, cewl, comments')
-    web_recon_parser.add_argument('--proxy_url', '-p', required=True, type=str, help='Proxy URL')
+    web_recon_parser.add_argument('--proxy_url', '-p', type=str, help='Proxy URL')
     web_recon_parser.add_argument('--target_url', '-t', required=True, type=str, nargs='+', help='Target URL with paths. Example: http://target.com/path1 and http://target.com/path2 will be "http://target.com path1 path2"')
 
     info_parser = subparsers.add_parser('info', help='Display information of important tools')
@@ -230,7 +242,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.command == 'enum':
-        main(args)
+        target = args.target
+        ip_address = target if is_valid_ipv4(target) else target
+        ip_address = target
+        if ip_address is None:
+            print(f"{colors['red']}[-] Invalid IP address or domain name: {target}{colors['reset']}")
+            sys.exit(1)        
+            
+        print(f"\n\n\033[1m{colors['yellow']}[--------] Scanning IP:{colors['reset']}\033[0m \033[1m{colors['cyan']}{ip_address}{colors['reset']}\033[0m \033[1m{colors['yellow']}[--------]{colors['reset']}\033[0m\n")
+
+        scans = ['tcp', 'udp', 'os']
+
+        with ProcessPoolExecutor(max_workers=3) as executor:
+            for scan in scans:
+                executor.submit(main, scan, args)
+
     elif args.command == 'web_recon':
         scan_types = [x.lower() for x in args.scan_type]
         web_recon(args.target_url, scan_types, args.proxy_url)
