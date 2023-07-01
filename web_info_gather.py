@@ -33,6 +33,10 @@ def get_links(url):
             href = a['href']
             if href and href != "#":
                 yield href
+        for element_with_src in soup.select('[src]'):
+            src = element_with_src['src']
+            if src:
+                yield src
     except Exception as e:
         print(f"{colors['red']}[Failure][Web Recon][links][{url}][{str(e)}]{colors['reset']}")
 
