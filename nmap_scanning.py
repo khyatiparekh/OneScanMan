@@ -112,12 +112,7 @@ service_name_mapping = {
     # SSL
     'https': 'ssl',
     'ssl/http': 'ssl',
-    'ssl/imap': 'ssl',
-    'ssl/pop3': 'ssl',
-    'ssl/smtp': 'ssl',
     'tls/http': 'ssl',
-    'ssl/ldap': 'ssl',
-    'ssl/ftp': 'ssl',
 
     # SSH
     'ssh-proxy': 'ssh',
