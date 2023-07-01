@@ -34,7 +34,7 @@ def get_links(url):
             if href and href != "#":
                 yield href
     except Exception as e:
-        print(f"{colors['red']}[-] Error fetching links from {url}: {str(e)}\n{colors['reset']}")
+        print(f"{colors['red']}[Failure][Web Recon][links][{url}][{str(e)}]{colors['reset']}")
 
 # Fetch all domains and email ids from webpage
 def fetch_email_and_domain(url):
@@ -68,8 +68,8 @@ def fetch_email_and_domain(url):
 
 # Function to run cewl
 def run_cewl(url, ip, path):
-   
-    print(f"Command: [cewl {url}]\n")
+
+    print(f"{colors['yellow']}[Web Recon][{colors['cyan']}cewl{colors['yellow']}][{url}]{colors['reset']}")
     if path =="/":
         path = ""
 
@@ -77,7 +77,7 @@ def run_cewl(url, ip, path):
         command = f"cewl {url}"
         os.system(command)
     except Exception as e:
-        print(f"{colors['red']}[-] Error running cewl on {url}: {str(e)}\n{colors['reset']}")
+        print(f"{colors['red']}[Failure][Web Recon][{url}][{str(e)}]{colors['reset']}")
 
 
 # Function to fetch and display contents of important files
@@ -102,7 +102,7 @@ def fetch_files(url):
         if response.status_code == 200:
             yield (file, response.text)
         elif response.status_code != 404:
-            print(f"Error fetching {file} from {url}: HTTP {response.status_code}")
+            print(f"{colors['red']}[Failure][Web Recon][File fetch][{file}][{url}][HTTP][{response.status_code}]{colors['reset']}")
 
 # Function to fetch all comments from webpage
 def fetch_comments(url):
@@ -111,7 +111,7 @@ def fetch_comments(url):
         comments = soup.find_all(string=lambda text: isinstance(text, Comment))
         yield from comments
     except Exception as e:
-        print(f"{colors['red']}[-] Error fetching comments from {url}: {str(e)}\n{colors['reset']}")
+        print(f"{colors['red']}[Failure][Web Recon][Comments][{url}][{str(e)}]{colors['reset']}")
 
 # Function to get the IP from the URL
 def get_ip_from_url(url):
@@ -138,14 +138,14 @@ def web_recon(url_paths, scans, proxy):
             result[url] = result.get(url, []) + paths
 
     for url in result:
-        print(f"\n{colors['cyan']}[Target --> URL:{url}]\n{colors['reset']}")
+        print(f"{colors['yellow']}[Web Recon][{colors['cyan']}{url}{colors['yellow']}]{colors['reset']}")
 
         ip = get_ip_from_url(url)
         paths = result[url]
         if ip is None:
             continue
 
-        if proxy:
+        if proxy and proxy != None:
             session.proxies = {
                 'http': str(proxy),
                 'https': str(proxy),
@@ -154,15 +154,16 @@ def web_recon(url_paths, scans, proxy):
                 session.get(url)
             except Exception as e:
                 if "cannot connect to proxy" in str(e).lower() or "not supported proxy scheme" in str(e).lower():
-                    print(f"{colors['red']}\n[-] Error connecting to proxy. Please use following format: (protocol)://(domain):(port)\n{colors['reset']}")
+                    print(f"{colors['red']}[Failure][Web Recon][Proxy][Please use following format: (protocol)://(domain):(port)]{colors['reset']}")
                     sys.exit()
 
+
         if "files" in scans or "all" in scans:
-            print(f"\n{colors['yellow']}[#] Robot Files for {url}\n{colors['reset']}")
+            print(f"{colors['yellow']}[Web Recon][Robot][Files][{colors['cyan']}{url}{colors['yellow']}]{colors['reset']}")
 
             o_files = dict(fetch_files(url))
             for files in o_files:
-                print(f"\n{colors['green']}File: {files}\n{colors['reset']}")
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Robot][Files][{colors['cyan']}{files}{colors['yellow']}]{colors['reset']}")
                 content = o_files[files]
                 print(f"{content}")
 
@@ -170,35 +171,33 @@ def web_recon(url_paths, scans, proxy):
             paths.append("/")
 
         for path in paths:
-            print(f"\n{colors['cyan']}[PATH:{path}]\n{colors['reset']}")
+            #print(f"{colors['cyan']}[PATH:{path}]\n{colors['reset']}")
             url_path = urljoin(url, path)
             output = {}
             if "links" in scans or "all" in scans:
-                print(f"\n{colors['yellow']}[#] Get Links{colors['reset']}")
+                #print(f"\n{colors['yellow']}[Web Recon] Get Links{colors['reset']}")
                 output["links"] = list(get_links(url_path))
                 if len(output["links"]) > 0:
-                    links = "\n".join(output["links"])
-                    print(f"\n{colors['green']}{links}\n{colors['reset']}")
-                else:
-                    print("\n")
+                    #links = "\n".join(output["links"])
+                    for links in output["links"]:
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
             if "domains" in scans or "all" in scans:
-                print(f"\n{colors['yellow']}[#] Domains [Possible use: Vhosts]\n{colors['reset']}")
+                #print(f"\n{colors['yellow']}[#] Domains [Possible use: Vhosts]\n{colors['reset']}")
                 emails, domains = fetch_email_and_domain(url_path)
-                print(f"\n{colors['green']}Emails:\n{colors['reset']}")
+                #print(f"\n{colors['green']}[Web Recon]Emails:\n{colors['reset']}")
                 for email in emails:
-                    print(f"{email}")
-                print(f"\n{colors['green']}Domains/IP:\n{colors['reset']}")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][Path:{colors['cyan']}{path}]{colors['reset']}[{email}]")
+                #print(f"\n{colors['green']}Domains/IP:\n{colors['reset']}")
                 for domain in domains:
-                    print(f"{domain}")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][Path:{colors['cyan']}{path}{colors['reset']}][{domain}]")
             if "comments" in scans or "all" in scans:
-                print(f"\n{colors['yellow']}[#] Comments{colors['reset']}")
+                #print(f"\n{colors['yellow']}[#] Comments{colors['reset']}")
 
                 output["comments"] = list(fetch_comments(url_path))
                 if len(output["comments"]) > 0:
-                    comments = "\n".join(output["comments"])
-                    print(f"\n{colors['green']}{comments}\n{colors['reset']}")
-                else:
-                    print("\n")
+                    #comments = "\n".join(output["comments"])
+                    for comments in output["comments"]:
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][Path:{colors['cyan']}{path}]{colors['reset']}[{comments}]")
             if "banner" in scans or "all" in scans:
                 result = urlparse(url)
 
@@ -225,11 +224,10 @@ def web_recon(url_paths, scans, proxy):
                 services = {port:scheme}
                 banner_result = banner_grabbing(ip, port, colors, services)
 
-                print(f"{colors['yellow']}[*] Server Banner [{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}]:{colors['reset']}")
                 for banner in banner_result:
-                    print(banner)
+                    print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][Path:{path}]{colors['reset']}[{banner}]")
 
             if "cewl" in scans or "all" in scans:
-                print(f"\n{colors['yellow']}[#] Word List\n{colors['reset']}")
+                print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}")
                 output["cewl_output"] = run_cewl(url_path, ip, path)                    
-            print(f"{colors['red']}\n-------------------------------URL {url}, Path {path} ends here--------------------------------------\n{colors['reset']}")
+            #print(f"{colors['red']}\n-------------------------------URL {url}, Path {path} ends here--------------------------------------\n{colors['reset']}")
