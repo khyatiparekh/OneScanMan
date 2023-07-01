@@ -74,8 +74,7 @@ def grab_banners_concurrently(ip_address, open_ports, colors, all_websites, max_
 def is_website_up(ip_address, port, protocol):
     try:
         url = f"{protocol}://{ip_address}:{port}"
-        requests.head(url, timeout=            if isinstance(banner, str):
-                banner = banner.strip()5, verify=False)
+        requests.head(url, timeout=5, verify=False)
         return True
     except Exception as e:
         return False
@@ -135,8 +134,7 @@ def main(scan_type, args):
             open_ports_str = ', '.join(f"{port}/{protocol}" for port, protocol in protocols.items())
             print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}]{colors['reset']}[{open_ports_str}]")
 
-            all_websites = {}            if isinstance(banner, str):
-                banner = banner.strip()
+            all_websites = {}
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 #print(f"\033[1m{colors['yellow']}[Web Discovery]{colors['yellow']}[Webservers]{colors['reset']}{colors['reset']}\033[0m")
 
