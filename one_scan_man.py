@@ -53,10 +53,10 @@ def grab_banner_for_port(args):
     if banner != None and len(banner) > 0:
         if isinstance(banner, tuple) and len(banner) == 1:
             banner = banner[0]
-        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{banner.strip()}]"
+        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{banner}]"
     else:
         banner = "Banner not found"
-        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{colors['red']}{banner.strip()}{colors['reset']}]"
+        return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{colors['red']}{banner}{colors['reset']}]"
 
 def grab_banners_concurrently(ip_address, open_ports, colors, all_websites, max_workers=10):
     #print(f"\n\033[1m{colors['yellow']}[Banner Discovery]{colors['reset']}\033[0m\n")
@@ -100,9 +100,9 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors):
     for service in ('http', 'ssl'):
         if service in service_to_port_map:
             if service in 'http':
-                web_recon('http://'+ip_address, ['banner,comments,domains,links,files'], 'None')
+                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files'], None)
             elif service in 'ssl':
-                web_recon('https://'+ip_address, ['banner,comments,domains,links,files'], 'None')
+                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files'], None)
 
             # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
@@ -162,9 +162,9 @@ def main(scan_type, args):
             for ports in service_banners:
                 if len(service_banners[ports]) == 0:
                     service_banners[ports] = "Banner not found"
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['red']}{service_banners[ports].strip()}{colors['reset']}]")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['red']}{service_banners[ports]}{colors['reset']}]")
                 else:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{service_banners[ports].strip()}]")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{service_banners[ports]}]")
 
             service_names = list(service_to_port_map.keys())
 
