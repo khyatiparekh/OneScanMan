@@ -53,6 +53,8 @@ def grab_banner_for_port(args):
     if banner != None and len(banner) > 0:
         if isinstance(banner, tuple) and len(banner) == 1:
             banner = banner[0]
+            if isinstance(banner, str):
+                banner = banner.strip()
         return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{banner}]"
     else:
         banner = "Banner not found"
@@ -72,7 +74,8 @@ def grab_banners_concurrently(ip_address, open_ports, colors, all_websites, max_
 def is_website_up(ip_address, port, protocol):
     try:
         url = f"{protocol}://{ip_address}:{port}"
-        requests.head(url, timeout=5, verify=False)
+        requests.head(url, timeout=            if isinstance(banner, str):
+                banner = banner.strip()5, verify=False)
         return True
     except Exception as e:
         return False
@@ -103,7 +106,8 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors):
                 web_recon(['http://'+ip_address], ['banner,comments,domains,links,files'], None)
             elif service in 'ssl':
                 web_recon(['https://'+ip_address], ['banner,comments,domains,links,files'], None)
-
+            if isinstance(banner, str):
+                banner = banner.strip()
             # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
@@ -131,7 +135,8 @@ def main(scan_type, args):
             open_ports_str = ', '.join(f"{port}/{protocol}" for port, protocol in protocols.items())
             print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}]{colors['reset']}[{open_ports_str}]")
 
-            all_websites = {}
+            all_websites = {}            if isinstance(banner, str):
+                banner = banner.strip()
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 #print(f"\033[1m{colors['yellow']}[Web Discovery]{colors['yellow']}[Webservers]{colors['reset']}{colors['reset']}\033[0m")
 
@@ -164,7 +169,9 @@ def main(scan_type, args):
                     service_banners[ports] = "Banner not found"
                     print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['red']}{service_banners[ports]}{colors['reset']}]")
                 else:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{service_banners[ports]}]")
+                    if isinstance(service_banners[ports], str):
+                        banner = service_banners[ports].strip()
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{banner}]")
 
             service_names = list(service_to_port_map.keys())
 
