@@ -5,7 +5,7 @@ import http.client
 
 def banner_grabbing_netcat(ip_address, port, timeout):
     try:
-        command = f"nc -w {timeout} {ip_address} {port}"
+        command = f"nc -w {timeout} {ip_address} {port} 2>/dev/null"
         banner = subprocess.check_output(command, shell=True, text=True, timeout=timeout)
         return banner.strip()
     except subprocess.TimeoutExpired:
@@ -33,7 +33,6 @@ def get_http_headers(ip_address, port, service):
                 return (header[1],)
         return headers
     except Exception as e:
-        print(e)
         return None
 
 def banner_grabbing(ip_address, port, colors, services):
