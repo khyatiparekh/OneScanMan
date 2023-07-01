@@ -3,7 +3,7 @@ import subprocess
 import nmap  
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from scanning_animation import scanning_animation
+#from scanning_animation import scanning_animation
 
 service_to_nse_scripts = {
     'http': [
@@ -158,19 +158,19 @@ def get_service_to_port_map(ip_address, open_ports, colors):
     if tcp_ports:
         arguments = "-sV -sT"
         command = f"sudo nmap {ip_address} -p {','.join(tcp_ports)} {arguments}"
-        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['reset']}{colors['cyan']}TCP {colors['reset']}\033[1m{colors['yellow']}ports {colors['reset']}\033[0m\033[0m [{command}]")
+        print(f"\033[1m{colors['yellow']}[Discover Services][{colors['cyan']}nmap{colors['yellow']}]\033[1m{colors['yellow']}[TCP]{colors['reset']}\033[0m\033[0m")
         nm.scan(ip_address, ','.join(tcp_ports), arguments=arguments)
         service_to_port_map, service_banners = collect_services(nm, service_to_port_map, service_banners)
 
     if udp_ports:
         arguments = "-sV -sU"
         command = f"sudo nmap {ip_address} -p {','.join(udp_ports)} {arguments}"
-        print(f"\n\033[1m{colors['yellow']}[#] Detecting Services on open {colors['cyan']}UDP {colors['reset']}ports {colors['reset']}\033[0m [{command}]")
+        print(f"\033[1m{colors['yellow']}[Discover Services][{colors['cyan']}nmap{colors['yellow']}]\033[0m\033[1m{colors['yellow']}[UDP]{colors['reset']}\033[0m")
         nm.scan(ip_address, ','.join(udp_ports), arguments=arguments)
         service_to_port_map, service_banners = collect_services(nm, service_to_port_map, service_banners)
 
     for protocol in unknown_protocols:
-        print(f"{colors['red']}[-] Invalid {protocol}{colors['reset']}")
+        print(f"{colors['red']}[Failure][Invalid Protocol][{protocol}]{colors['reset']}")
 
     return service_to_port_map, service_banners
 
@@ -196,17 +196,17 @@ def run_nmap_scripts_on_port(ip_address, port, scripts, colors, retries=3):
             output = subprocess.check_output(command, shell=True, text=True)
             break
         except subprocess.CalledProcessError as e:
-            print(f"{colors['red']}[-] Nmap scripts {scripts} on port {port} failed with error code {e.returncode}{colors['reset']}\n")
-            print(f"{colors['yellow']}Retrying {i + 1}/{retries}{colors['reset']}")
+            print(f"{colors['red']}[Failure][Script Scan][nmap][{scripts}][{port}][{e}]{colors['reset']}")
+            print(f"{colors['yellow']}[Retrying][{i + 1}/{retries}]{colors['reset']}")
             output = None
     return output
 
 def run_nmap(ip_address, open_ports, output_dir, colors, service_to_port_map):
-    print(f"\n\033[1m{colors['yellow']}[#] Enumerating the open ports{colors['reset']}\033[0m [sudo nmap -n -Pn -T4 -p<insert_port_here> --script <insert_script_names_here> {ip_address}]\n")
+    #print(f"\033[1m{colors['yellow']}[Script Scan]{colors['reset']}\033[0m [sudo nmap -n -Pn -T4 -p<insert_port_here> --script <insert_script_names_here> {ip_address}]")
 
-    stop_animation_event = threading.Event()
-    animation_thread = threading.Thread(target=scanning_animation, args=(stop_animation_event,))
-    animation_thread.start()
+    #stop_animation_event = threading.Event()
+    #animation_thread = threading.Thread(target=scanning_animation, args=(stop_animation_event,))
+    #animation_thread.start()
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -217,7 +217,7 @@ def run_nmap(ip_address, open_ports, output_dir, colors, service_to_port_map):
 
             nse_scripts = service_to_nse_scripts[service]
             for port in ports:
-                print(f"{colors['yellow']}\r\x1b[K[*] Scanning:{colors['reset']} Port {colors['cyan']}{port}{colors['reset']}, Scripts {nse_scripts}")
+                print(f"{colors['yellow']}\r\x1b[K[Script Scan]{colors['reset']}{colors['cyan']}[{port}]{colors['reset']}{nse_scripts}")
 
                 future = executor.submit(run_nmap_scripts_on_port, ip_address, port, nse_scripts, colors)
                 futures[future] = (port, nse_scripts)
@@ -233,7 +233,7 @@ def run_nmap(ip_address, open_ports, output_dir, colors, service_to_port_map):
                     f.write(output)
                     f.write("\n\n\n" + "=" * 80 + "\n\n")
 
-            print(f"{colors['green']}\r\x1b[K[\u2713] Completed:{colors['reset']} Port {colors['cyan']}{port}{colors['reset']}, Scripts {scripts}")
+            print(f"{colors['green']}\r\x1b[K[Script Scan][{colors['cyan']}{port}{colors['green']}][Completed{colors['green']}]{colors['reset']}{scripts}")
 
-    stop_animation_event.set()
-    animation_thread.join()
+    #stop_animation_event.set()
+    #animation_thread.join()
