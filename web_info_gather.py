@@ -7,7 +7,7 @@ from tldextract import extract
 from urlextract import URLExtract
 import urllib3
 import chardet
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin, parse_qs
 from bs4 import BeautifulSoup, Comment
 from banner_grabbing import banner_grabbing
 
@@ -24,6 +24,89 @@ session = requests.Session()
 session.verify = False
 session.timeout = 15
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+all_links = []
+visited = set()
+
+def get_domain(url):
+    parsed_url = urlparse(url)
+    domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_url)
+    return domain
+
+def extract_params(url):
+    parsed_url = urlparse(url)
+    params = parse_qs(parsed_url.query)
+    return params
+
+def search_url(url, depth=0, max_depth=3):
+    global visited
+    #print(depth)
+    if depth > max_depth:
+        return []
+
+    visited.add(url)  # Add current url to visited set
+    all_links.append(url)
+    #print(visited)
+    parsed_url = urlparse(url)
+    domain = get_domain(url)
+    #base_url = '{uri.scheme}://{uri.netloc}{uri.path}'.format(uri=parsed_url)
+    base_url = domain.rsplit('/', 1)[0]  # remove the last component
+    found_urls = []
+    try:
+        response = session.get(url)
+        # Parse the HTML content of the page with BeautifulSoup
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # For each link in the HTML, get the URL of the link and extract parameters
+        for link in soup.find_all(['a', '[src]']):
+            #print(link)
+            new_url = link.get('href') or link.get('src')
+            if new_url and new_url != "#":
+                #print(new_url)
+                if new_url.startswith('/'):
+                    new_url = domain.rstrip('/') + new_url
+                elif not new_url.startswith('http'):
+                    new_url = base_url.rstrip('/') + '/' + new_url.lstrip('/')
+                if new_url.startswith(domain) and new_url not in visited:
+                    params = extract_params(new_url)
+                    print(f"URL: {new_url}, Params: {params}")
+                    found_urls.append(new_url)
+                    found_urls.extend(search_url(new_url, depth+1, max_depth))
+
+        found_urls = list(set(found_urls))
+
+        # Check for URLs within inline JavaScript
+        for script in soup.find_all(['script','[src]']):
+            new_url = script.get('src')
+            if new_url and new_url != "#":
+                #print(new_url)
+                if new_url.startswith('/'):
+                    new_url = domain.rstrip('/') + new_url
+                elif not new_url.startswith('http'):
+                    new_url = base_url.rstrip('/') + '/' + new_url.lstrip('/')
+                if new_url.startswith(domain) and new_url not in visited:
+                    params = extract_params(new_url)
+                    print(f"URL: {new_url}, Params: {params}")
+                    found_urls.append(new_url)
+                    found_urls.extend(search_url(new_url, depth+1, max_depth))
+
+        found_urls = list(set(found_urls))
+
+        # Check for URLs within HTML comments
+        for comment in soup.find_all(text=lambda text: isinstance(text, Comment)):
+            # Using regex pattern to extract URLs from comments
+            urls = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', comment)
+            for new_url in urls:
+                if new_url.startswith(domain) and new_url not in visited:
+                    params = extract_params(new_url)
+                    print(f"URL: {new_url}, Params: {params}")
+                    found_urls.append(new_url)
+                    found_urls.extend(search_url(new_url, depth+1, max_depth))
+
+        found_urls = list(set(found_urls))
+    except Exception as e:
+        print(f"{colors['red']}[Failure][Web Recon][links][{url}][{str(e)}]{colors['reset']}")
+
+    return found_urls
 
 # Function to get all hyperlinks and paths from page
 def get_links(url):
@@ -178,12 +261,18 @@ def web_recon(url_paths, scans, proxy):
             #print(f"{colors['cyan']}[PATH:{path}]\n{colors['reset']}")
             url_path = urljoin(url, path)
             output = {}
+
+            if "params" in scans or "all" in scans:
+                result = search_url(url)
             if "links" in scans or "all" in scans:
                 #print(f"\n{colors['yellow']}[Web Recon] Get Links{colors['reset']}")
                 output["links"] = list(get_links(url_path))
                 if len(output["links"]) > 0:
+                    print(output['links'])
+                    alinks = output["links"] + all_links
+                    alinks = list(set(alinks))
                     #links = "\n".join(output["links"])
-                    for links in output["links"]:
+                    for links in alinks:
                         print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
             if "domains" in scans or "all" in scans:
                 #print(f"\n{colors['yellow']}[#] Domains [Possible use: Vhosts]\n{colors['reset']}")
