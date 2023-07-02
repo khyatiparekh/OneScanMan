@@ -242,6 +242,7 @@ if __name__ == "__main__":
     web_recon_parser = subparsers.add_parser('web_recon', help='Perform web reconnaissance')
     web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform. i.e. All, files, links, domains, cewl, comments')
     web_recon_parser.add_argument('--proxy_url', '-p', type=str, help='Proxy URL')
+    web_recon_parser.add_argument('--depth', '-d', type=str, help='Recurse Depth')
     web_recon_parser.add_argument('--target_url', '-t', required=True, type=str, nargs='+', help='Target URL with paths. Example: http://target.com/path1 and http://target.com/path2 will be "http://target.com path1 path2"')
 
     info_parser = subparsers.add_parser('info', help='Display information of important tools')
@@ -266,7 +267,7 @@ if __name__ == "__main__":
 
     elif args.command == 'web_recon':
         scan_types = [x.lower() for x in args.scan_type]
-        web_recon(args.target_url, scan_types, args.proxy_url)
+        web_recon(args.target_url, scan_types, args.proxy_url, args)
     elif args.command == 'info':
         display_info()
     else:
