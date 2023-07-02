@@ -225,7 +225,12 @@ def get_ip_from_url(url):
     return hostname
 
 # Main function
-def web_recon(url_paths, scans, proxy):
+def web_recon(url_paths, scans, proxy, args):
+    if args.depth:
+        depth = int(args.depth)
+    else:
+        depth = None
+
     scans = scans[0]
     result = {}
     for item in url_paths:
@@ -276,7 +281,6 @@ def web_recon(url_paths, scans, proxy):
         if "/" not in paths:
             paths.append("/")
 
-        depth = None
         if "params" in scans or "all" in scans:
             if depth != None:
                 result = search_url(url, depth)
