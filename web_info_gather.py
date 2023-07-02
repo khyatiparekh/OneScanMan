@@ -40,7 +40,7 @@ def extract_params(url):
     params = parse_qs(parsed_url.query)
     return params
 
-def search_url(url, depth=0, max_depth=3):
+def search_url(url, depth=0, max_depth=30):
     global visited, params_from_pages, input_vals
     #print(depth)
     if depth > max_depth:
