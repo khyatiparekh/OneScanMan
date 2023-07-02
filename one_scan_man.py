@@ -55,6 +55,8 @@ def grab_banner_for_port(args):
             banner = banner[0]
             if isinstance(banner, str):
                 banner = banner.strip()
+        elif isinstance(banner, str):
+            banner = banner.strip()
         return f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}http.client/socket/netcat{colors['yellow']}][{colors['cyan']}{port}{colors['yellow']}]{colors['reset']}[{banner}]"
     else:
         banner = "Banner not found"
@@ -105,8 +107,6 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors):
                 web_recon(['http://'+ip_address], ['banner,comments,domains,links,files'], None)
             elif service in 'ssl':
                 web_recon(['https://'+ip_address], ['banner,comments,domains,links,files'], None)
-            if isinstance(banner, str):
-                banner = banner.strip()
             # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
@@ -169,6 +169,8 @@ def main(scan_type, args):
                 else:
                     if isinstance(service_banners[ports], str):
                         banner = service_banners[ports].strip()
+                    else:
+                        banner = service_banners[ports]
                     print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Banner][{colors['cyan']}nmap{colors['yellow']}][{colors['cyan']}{scan_type_u}{colors['yellow']}][{colors['cyan']}{ports}{colors['yellow']}]{colors['reset']}[{colors['reset']}{banner}]")
 
             service_names = list(service_to_port_map.keys())
