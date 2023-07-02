@@ -2,6 +2,7 @@ import os
 import requests
 import argparse
 import re
+import json
 import sys
 from tldextract import extract
 from urlextract import URLExtract
@@ -26,6 +27,8 @@ session.timeout = 15
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 all_links = []
 visited = set()
+params_from_pages = {}
+input_vals = {}
 
 def get_domain(url):
     parsed_url = urlparse(url)
@@ -38,7 +41,7 @@ def extract_params(url):
     return params
 
 def search_url(url, depth=0, max_depth=3):
-    global visited
+    global visited, params_from_pages, input_vals
     #print(depth)
     if depth > max_depth:
         return []
@@ -48,7 +51,6 @@ def search_url(url, depth=0, max_depth=3):
     #print(visited)
     parsed_url = urlparse(url)
     domain = get_domain(url)
-    #base_url = '{uri.scheme}://{uri.netloc}{uri.path}'.format(uri=parsed_url)
     base_url = domain.rsplit('/', 1)[0]  # remove the last component
     found_urls = []
     try:
@@ -56,6 +58,8 @@ def search_url(url, depth=0, max_depth=3):
         # Parse the HTML content of the page with BeautifulSoup
         soup = BeautifulSoup(response.content, 'html.parser')
 
+        if base_url not in params_from_pages:
+            params_from_pages[base_url] = []
         # For each link in the HTML, get the URL of the link and extract parameters
         for link in soup.find_all(['a', '[src]']):
             #print(link)
@@ -68,7 +72,7 @@ def search_url(url, depth=0, max_depth=3):
                     new_url = base_url.rstrip('/') + '/' + new_url.lstrip('/')
                 if new_url.startswith(domain) and new_url not in visited:
                     params = extract_params(new_url)
-                    print(f"URL: {new_url}, Params: {params}")
+                    params_from_pages[base_url].append({"url": new_url, "params": params})
                     found_urls.append(new_url)
                     found_urls.extend(search_url(new_url, depth+1, max_depth))
 
@@ -85,7 +89,7 @@ def search_url(url, depth=0, max_depth=3):
                     new_url = base_url.rstrip('/') + '/' + new_url.lstrip('/')
                 if new_url.startswith(domain) and new_url not in visited:
                     params = extract_params(new_url)
-                    print(f"URL: {new_url}, Params: {params}")
+                    params_from_pages[base_url].append({"url": new_url, "params": params})
                     found_urls.append(new_url)
                     found_urls.extend(search_url(new_url, depth+1, max_depth))
 
@@ -98,10 +102,25 @@ def search_url(url, depth=0, max_depth=3):
             for new_url in urls:
                 if new_url.startswith(domain) and new_url not in visited:
                     params = extract_params(new_url)
-                    print(f"URL: {new_url}, Params: {params}")
+                    params_from_pages[base_url].append({"url": new_url, "params": params})
                     found_urls.append(new_url)
                     found_urls.extend(search_url(new_url, depth+1, max_depth))
 
+        if base_url not in input_vals:
+            input_vals[base_url] = []
+        # Check for input elements and their type and value attributes
+        for input_element in soup.find_all('input'):
+            input_type = input_element.get('type')
+            input_value = input_element.get('value')
+            input_name = input_element.get('name')
+            input_vals[base_url].append({"input_type": str(input_type), "input_value": str(input_value), "input_name": str(input_name)})
+
+        params_str = [json.dumps(d, sort_keys=True) for d in params_from_pages[base_url]]
+        params_str = list(set(params_str))
+        params_from_pages[base_url] = [json.loads(s) for s in params_str]
+        params_str = [json.dumps(d, sort_keys=True) for d in input_vals[base_url]]
+        params_str = list(set(params_str))
+        input_vals[base_url] = [json.loads(s) for s in params_str]
         found_urls = list(set(found_urls))
     except Exception as e:
         print(f"{colors['red']}[Failure][Web Recon][links][{url}][{str(e)}]{colors['reset']}")
@@ -257,38 +276,43 @@ def web_recon(url_paths, scans, proxy):
         if "/" not in paths:
             paths.append("/")
 
+        depth = None
+        if "params" in scans or "all" in scans:
+            if depth != None:
+                result = search_url(url, depth)
+            else:
+                result = search_url(url)
+                depth = 10
+            if len(params_from_pages) > 0:
+                for scanned_url in params_from_pages:
+                    for params_in_scanned_urls in params_from_pages[scanned_url]:
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Possible Params][Depth: {str(depth)}][{colors['cyan']}{scanned_url}{colors['yellow']}]{colors['reset']}[{colors['red']}URL{colors['reset']}: {params_in_scanned_urls['url']}][{colors['red']}Params{colors['reset']}: {params_in_scanned_urls['params']}]")
+
+            if len(input_vals) > 0:
+                for scanned_url in input_vals:
+                    for inputs_in_scanned_urls in input_vals[scanned_url]:
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][<input>][Depth: {str(depth)}][{colors['cyan']}{scanned_url}{colors['yellow']}]{colors['reset']}[{colors['red']}Type{colors['reset']}: {inputs_in_scanned_urls['input_type']}][{colors['red']}Value{colors['reset']}: {inputs_in_scanned_urls['input_value']}][{colors['red']}Name{colors['reset']}: {inputs_in_scanned_urls['input_name']}]")
+
         for path in paths:
-            #print(f"{colors['cyan']}[PATH:{path}]\n{colors['reset']}")
             url_path = urljoin(url, path)
             output = {}
 
-            if "params" in scans or "all" in scans:
-                result = search_url(url)
             if "links" in scans or "all" in scans:
-                #print(f"\n{colors['yellow']}[Web Recon] Get Links{colors['reset']}")
                 output["links"] = list(get_links(url_path))
                 if len(output["links"]) > 0:
-                    print(output['links'])
                     alinks = output["links"] + all_links
                     alinks = list(set(alinks))
-                    #links = "\n".join(output["links"])
                     for links in alinks:
                         print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
             if "domains" in scans or "all" in scans:
-                #print(f"\n{colors['yellow']}[#] Domains [Possible use: Vhosts]\n{colors['reset']}")
                 emails, domains = fetch_email_and_domain(url_path)
-                #print(f"\n{colors['green']}[Web Recon]Emails:\n{colors['reset']}")
                 for email in emails:
                     print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][Path:{colors['cyan']}{path}]{colors['reset']}[{email}]")
-                #print(f"\n{colors['green']}Domains/IP:\n{colors['reset']}")
                 for domain in domains:
                     print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][Path:{colors['cyan']}{path}{colors['reset']}][{domain}]")
             if "comments" in scans or "all" in scans:
-                #print(f"\n{colors['yellow']}[#] Comments{colors['reset']}")
-
                 output["comments"] = list(fetch_comments(url_path))
                 if len(output["comments"]) > 0:
-                    #comments = "\n".join(output["comments"])
                     for comments in output["comments"]:
                         print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][Path:{colors['cyan']}{path}]{colors['reset']}[{comments}]")
             if "banner" in scans or "all" in scans:
@@ -323,4 +347,3 @@ def web_recon(url_paths, scans, proxy):
             if "cewl" in scans or "all" in scans:
                 print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}")
                 output["cewl_output"] = run_cewl(url_path, ip, path)                    
-            #print(f"{colors['red']}\n-------------------------------URL {url}, Path {path} ends here--------------------------------------\n{colors['reset']}")
