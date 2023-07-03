@@ -225,8 +225,10 @@ def get_ip_from_url(url):
     return hostname
 
 # Main function
-def web_recon(url_paths, scans, proxy, args):
-    if args.depth:
+def web_recon(url_paths, scans, proxy, args, origin):
+    if origin == 'main':
+        depth = None
+    elif args.depth:
         depth = int(args.depth)
     else:
         depth = None
