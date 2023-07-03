@@ -104,10 +104,9 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors, args):
     for service in ('http', 'ssl'):
         if service in service_to_port_map:
             if service in 'http':
-                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files,params'], None, args)
+                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files,params'], None, args, "main")
             elif service in 'ssl':
-                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files,params'], None, args)
-            # Add ffuf for finding vhosts here [Bruteforce]
+                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files,params'], None, args, "main")
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
                 run_dirsearch(ip_address, port, output_dir, colors)
@@ -271,7 +270,7 @@ if __name__ == "__main__":
             print(f"{colors['red']}\n[-] Max allowed depth is 30\n{colors['reset']}")
             parser.print_help()
             sys.exit()
-        web_recon(args.target_url, scan_types, args.proxy_url, args)
+        web_recon(args.target_url, scan_types, args.proxy_url, args, "web")
     elif args.command == 'info':
         display_info()
     else:
