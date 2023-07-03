@@ -99,14 +99,14 @@ def check_https(ip_address, port):
         pass
     return None
    
-def scan_services(ip_address, service_to_port_map, output_dir, colors):
+def scan_services(ip_address, service_to_port_map, output_dir, colors, args):
 
     for service in ('http', 'ssl'):
         if service in service_to_port_map:
             if service in 'http':
-                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files,params'], None)
+                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files,params'], None, args)
             elif service in 'ssl':
-                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files,params'], None)
+                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files,params'], None, args)
             # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
@@ -214,7 +214,7 @@ def main(scan_type, args):
             if scan_type == "udp":
                 return
 
-            scan_services(ip_address, service_to_port_map, output_dir, colors)
+            scan_services(ip_address, service_to_port_map, output_dir, colors, args)
 
             # Run Nikto for detected web servers
             for service in ('http', 'ssl'):
