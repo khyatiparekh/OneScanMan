@@ -267,7 +267,7 @@ if __name__ == "__main__":
 
     elif args.command == 'web_recon':
         scan_types = [x.lower() for x in args.scan_type]
-        if int(args.depth) > 30:
+        if args.depth and int(args.depth) > 30:
             print(f"{colors['red']}\n[-] Max allowed depth is 30\n{colors['reset']}")
             parser.print_help()
             sys.exit()
