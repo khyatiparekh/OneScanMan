@@ -1,6 +1,5 @@
 import os
 import requests
-import argparse
 import re
 import json
 import sys
@@ -11,6 +10,7 @@ import chardet
 from urllib.parse import urlparse, urljoin, parse_qs
 from bs4 import BeautifulSoup, Comment
 from banner_grabbing import banner_grabbing
+from dirsearch_scan import run_dirsearch
 
 colors = {
     'red': '\033[91m',
@@ -353,3 +353,33 @@ def web_recon(url_paths, scans, proxy, args, origin):
             if "cewl" in scans or "all" in scans:
                 print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}")
                 output["cewl_output"] = run_cewl(url_path, ip, path)                    
+        
+        if 'dirbust' in scans or 'all' in scans:
+            result = urlparse(url)
+
+            if result.scheme != None:
+                scheme = str(result.scheme)
+            if result.port != None:
+                port = str(result.port)
+
+            if "https" in url and result.port == None:
+                scheme = "https"
+                port = "443"
+                
+            elif "http" in url and result.port == None:
+                scheme = "http"
+                port = "80"
+                
+            else:
+                if result.port == None:
+                    port = "80" 
+                    
+            if result.hostname != None:
+                url = result.hostname
+            elif 'http' in url:
+                url = url.replace('http://','')
+            elif 'https' in url:
+                url = url.replace('https://','')
+            
+            output_dir = "./Reports/" + url 
+            run_dirsearch(url, port, output_dir, colors)
