@@ -104,9 +104,9 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors):
     for service in ('http', 'ssl'):
         if service in service_to_port_map:
             if service in 'http':
-                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files'], None)
+                web_recon(['http://'+ip_address], ['banner,comments,domains,links,files,params'], None)
             elif service in 'ssl':
-                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files'], None)
+                web_recon(['https://'+ip_address], ['banner,comments,domains,links,files,params'], None)
             # Add ffuf for finding vhosts here [Bruteforce]
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
