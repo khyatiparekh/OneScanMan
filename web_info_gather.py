@@ -42,13 +42,11 @@ def extract_params(url):
 
 def search_url(url, depth=0, max_depth=30):
     global visited, params_from_pages, input_vals
-    #print(depth)
     if depth > max_depth:
         return []
 
     visited.add(url)  # Add current url to visited set
     all_links.append(url)
-    #print(visited)
     parsed_url = urlparse(url)
     domain = get_domain(url)
     base_url = domain.rsplit('/', 1)[0]  # remove the last component
@@ -62,10 +60,8 @@ def search_url(url, depth=0, max_depth=30):
             params_from_pages[base_url] = []
         # For each link in the HTML, get the URL of the link and extract parameters
         for link in soup.find_all(['a', '[src]']):
-            #print(link)
             new_url = link.get('href') or link.get('src')
             if new_url and new_url != "#":
-                #print(new_url)
                 if new_url.startswith('/'):
                     new_url = domain.rstrip('/') + new_url
                 elif not new_url.startswith('http'):
@@ -82,7 +78,6 @@ def search_url(url, depth=0, max_depth=30):
         for script in soup.find_all(['script','[src]']):
             new_url = script.get('src')
             if new_url and new_url != "#":
-                #print(new_url)
                 if new_url.startswith('/'):
                     new_url = domain.rstrip('/') + new_url
                 elif not new_url.startswith('http'):
@@ -276,7 +271,7 @@ def web_recon(url_paths, scans, proxy, args, origin):
 
             o_files = dict(fetch_files(url))
             for files in o_files:
-                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Robot][Files][{colors['cyan']}{files}{colors['yellow']}]{colors['reset']}")
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Robot][Files][{colors['cyan']}{url}{colors['yellow']}][{colors['cyan']}{files}{colors['yellow']}]{colors['reset']}")
                 content = o_files[files]
                 print(f"{content}")
 
@@ -309,18 +304,18 @@ def web_recon(url_paths, scans, proxy, args, origin):
                     alinks = output["links"] + all_links
                     alinks = list(set(alinks))
                     for links in alinks:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
             if "domains" in scans or "all" in scans:
                 emails, domains = fetch_email_and_domain(url_path)
                 for email in emails:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][Path:{colors['cyan']}{path}]{colors['reset']}[{email}]")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}[{email}]")
                 for domain in domains:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][Path:{colors['cyan']}{path}{colors['reset']}][{domain}]")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['reset']}][{domain}]")
             if "comments" in scans or "all" in scans:
                 output["comments"] = list(fetch_comments(url_path))
                 if len(output["comments"]) > 0:
                     for comments in output["comments"]:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][Path:{colors['cyan']}{path}]{colors['reset']}[{comments}]")
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}[{comments}]")
             if "banner" in scans or "all" in scans:
                 result = urlparse(url)
 
@@ -348,7 +343,7 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 banner_result = banner_grabbing(ip, port, colors, services)
 
                 for banner in banner_result:
-                    print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][Path:{path}]{colors['reset']}[{banner}]")
+                    print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{banner}]")
 
             if "cewl" in scans or "all" in scans:
                 print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}")
