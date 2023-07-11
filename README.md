@@ -57,22 +57,6 @@ Enumeration
                - Domains
                - Comments
                - Banner
-           
-Web Recon
-- Performs the following tasks:
-   - Extract Links
-   - Discover Robot files
-   - Extract Parameters in URL's present within the webpage
-   - Extract Domains
-   - Extract Comments
-   - Discover Banner
-   - Run Dirsearch
-   - Run cewl to create wordlist from webpage
-
-Info
-- Lists information about important tools and their basic usage.
-  
-Enum
 ```
 usage: one_scan_man.py enum [-h] --target TARGET --output_dir OUTPUT_DIR --interface INTERFACE
 
@@ -86,7 +70,17 @@ options:
                         Interface to use for scanning
 ```
 
+           
 Web Recon
+- Performs the following tasks:
+   - Extract Links
+   - Discover Robot files
+   - Extract Parameters in URL's present within the webpage
+   - Extract Domains
+   - Extract Comments
+   - Discover Banner
+   - Run Dirsearch
+   - Run cewl to create wordlist from webpage
 ```
 usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] --proxy_url PROXY_URL --target_url TARGET_URL [TARGET_URL ...]
 
@@ -101,12 +95,13 @@ options:
 ```
 
 Info
+- Lists information about important tools and their basic usage.
 ```
 usage: one_scan_man.py info [-h]
 
 options:
   -h, --help  show this help message and exit
-```
+```  
 
 ## Example:
 ```python one_scan_man.py enum -t 192.168.203.50 -o 192.168.203.50 -i tun0```
