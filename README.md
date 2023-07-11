@@ -59,7 +59,7 @@ Enumeration
                - Banner
            
 Web Recon
-- Perform the following tasks:
+- Performs the following tasks:
    - Extract Links
    - Discover Robot files
    - Extract Parameters in URL's present within the webpage
