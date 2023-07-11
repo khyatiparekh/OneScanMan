@@ -33,6 +33,45 @@ options:
   -h, --help            show this help message and exit
 ```
 
+# Features
+Enumeration
+- Performs network enumeration using the following tools:
+     - nmap/masscan
+     - dirsearch/gobuster
+     - nikto
+     - smbmap
+     - smbclient
+- Performs the following tasks:
+     - Port Discovery
+     - Service Discovery
+     - Banner Grabbing
+     - Samba Enumeration
+     - nmap script scanning
+     - Directory brute force
+     - Web application Enumeration
+          - Run Nikto
+          - Scrape webpage to find the following:
+               - Links
+               - Robot files
+               - Parameters in URL's present within the webpage
+               - Domains
+               - Comments
+               - Banner
+           
+Web Recon
+- Perform the following tasks:
+   - Extract Links
+   - Discover Robot files
+   - Extract Parameters in URL's present within the webpage
+   - Extract Domains
+   - Extract Comments
+   - Discover Banner
+   - Run Dirsearch
+   - Run cewl to create wordlist from webpage
+
+Info
+- Lists information about important tools and their basic usage.
+  
 Enum
 ```
 usage: one_scan_man.py enum [-h] --target TARGET --output_dir OUTPUT_DIR --interface INTERFACE
