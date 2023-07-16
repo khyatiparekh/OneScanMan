@@ -342,6 +342,8 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 output["comments"] = list(fetch_comments(url_path))
                 if len(output["comments"]) > 0:
                     for comments in output["comments"]:
+                        if isinstance(comments, str):
+                            comments = comments.strip()
                         print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}\n{comments}")
             if "banner" in scans or "all" in scans:
                 result = urlparse(url)
