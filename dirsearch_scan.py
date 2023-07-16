@@ -22,7 +22,7 @@ def is_website_up(ip_address, port, protocol):
         return False
 
 def run_gobuster(ip_address, port, protocol, output_file, colors):
-    command = f"sudo gobuster dir -u {protocol}://{ip_address}:{port} -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -s 200,204,301,302,307,401,403 -o {output_file}"
+    command = f"sudo gobuster dir -u {protocol}://{ip_address}:{port} -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -o {output_file}"
     try:
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
