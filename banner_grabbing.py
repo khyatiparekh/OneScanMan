@@ -3,6 +3,14 @@ import ssl
 import subprocess
 import http.client
 
+colors = {
+    'red': '\033[91m',
+    'green': '\033[92m',
+    'yellow': '\033[93m',
+    'cyan': '\033[96m',
+    'reset': '\033[0m'
+}
+
 def banner_grabbing_netcat(ip_address, port, timeout):
     try:
         command = f"nc -w {timeout} {ip_address} {port} 2>/dev/null"
@@ -30,6 +38,12 @@ def get_http_headers(ip_address, port, service):
         header_return = ""
         for header in headers:
             if "server" in header[0].lower():
+                if (isinstance(headers, list)):
+                    for header_info in headers:
+                        print(f"{colors['yellow']}[Web Recon][headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}[{header_info}]")
+                else:
+                        print(f"{colors['yellow']}[Web Recon][headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}[{headers}]")
+
                 return (header[1],)
         return headers
     except Exception as e:
