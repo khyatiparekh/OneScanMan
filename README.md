@@ -16,7 +16,8 @@ All it takes is one normal scan. (Initial network enumeration script for CTFs. C
 ## Prerequisite:
 - Run the following commands before executing the script:
     - ``` pip install -r requirements.txt ```
-    
+    - ``` sudo apt-get install dirsearch gobuster ```
+ 
 ## USAGE: 
 ```
 usage: one_scan_man.py [-h] {enum,web_recon,info} ...
