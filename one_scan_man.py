@@ -238,9 +238,10 @@ if __name__ == "__main__":
     enum_parser.add_argument('--interface', '-i', required=True, type=str, help='Interface to use for scanning')
 
     web_recon_parser = subparsers.add_parser('web_recon', help='Perform web reconnaissance')
-    web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform. i.e. All, files, links, domains, cewl, comments')
+    web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust')
     web_recon_parser.add_argument('--proxy_url', '-p', type=str, help='Proxy URL')
     web_recon_parser.add_argument('--depth', '-d', type=str, help='Recurse Depth')
+    web_recon_parser.add_argument('--cookies', '-c', type=str, help='Cookies')
     web_recon_parser.add_argument('--target_url', '-t', required=True, type=str, nargs='+', help='Target URL with paths. Example: http://target.com/path1 and http://target.com/path2 will be "http://target.com path1 path2"')
 
     info_parser = subparsers.add_parser('info', help='Display information of important tools')
