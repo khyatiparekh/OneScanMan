@@ -24,6 +24,9 @@ colors = {
 session = requests.Session()
 session.verify = False
 session.timeout = 15
+# Add cookies to the session
+cookies = {}
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 all_links = []
 visited = set()
@@ -53,9 +56,13 @@ def search_url(url, depth=0, max_depth=30):
     found_urls = []
     try:
         response = session.get(url)
+        response.encoding = response.apparent_encoding
         # Parse the HTML content of the page with BeautifulSoup
-        soup = BeautifulSoup(response.content, 'html.parser')
-
+        try:
+            soup = BeautifulSoup(response.text, 'html.parser')
+        except Exception as e:
+            print(f"{colors['red']}[Failure][Web Recon][links][Encoding Issue][{url}][{str(e)}]{colors['reset']}")
+            return []
         if base_url not in params_from_pages:
             params_from_pages[base_url] = []
         # For each link in the HTML, get the URL of the link and extract parameters
@@ -214,6 +221,14 @@ def fetch_comments(url):
     except Exception as e:
         print(f"{colors['red']}[Failure][Web Recon][Comments][{url}][{str(e)}]{colors['reset']}")
 
+# Fetch Cookies
+def fetch_cookies(url):
+    try:
+        res = session.get(url)
+    except Exception as e:
+        return False
+    return res.cookies
+
 # Function to get the IP from the URL
 def get_ip_from_url(url):
     hostname = urlparse(url).hostname
@@ -227,6 +242,14 @@ def web_recon(url_paths, scans, proxy, args, origin):
         depth = int(args.depth)
     else:
         depth = None
+
+    if args.cookies:
+        try:
+            cookies_dict = dict(x.split('=') for x in args.cookies.split('; '))
+            session.cookies.update(cookies_dict)
+        except Exception as e:
+            print(f"{colors['red']}[Failure][Web Recon][Cookies][{str(e)}]{colors['reset']}")
+            return False
 
     scans = scans[0]
     result = {}
@@ -298,6 +321,10 @@ def web_recon(url_paths, scans, proxy, args, origin):
             url_path = urljoin(url, path)
             output = {}
 
+            if "cookies" in scans or "all" in scans:
+                cookies = fetch_cookies(url_path)
+                for cookie in cookies:
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Cookies][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{cookie}]")
             if "links" in scans or "all" in scans:
                 output["links"] = list(get_links(url_path))
                 if len(output["links"]) > 0:
@@ -315,7 +342,7 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 output["comments"] = list(fetch_comments(url_path))
                 if len(output["comments"]) > 0:
                     for comments in output["comments"]:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}[{comments}]")
+                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}\n{comments}")
             if "banner" in scans or "all" in scans:
                 result = urlparse(url)
 
