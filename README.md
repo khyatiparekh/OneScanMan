@@ -76,20 +76,25 @@ Web Recon
    - Extract Links
    - Discover Robot files
    - Extract Parameters in URL's present within the webpage
+   - Extract Cookies
    - Extract Domains
    - Extract Comments
    - Discover Banner
    - Run Dirsearch
    - Run cewl to create wordlist from webpage
 ```
-usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] --proxy_url PROXY_URL --target_url TARGET_URL [TARGET_URL ...]
+usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] [--proxy_url PROXY_URL] [--depth DEPTH] [--cookies COOKIES] --target_url TARGET_URL [TARGET_URL ...]
 
 options:
   -h, --help            show this help message and exit
   --scan_type SCAN_TYPE [SCAN_TYPE ...], -s SCAN_TYPE [SCAN_TYPE ...]
-                        Type of scan to perform. i.e. All, files, links, domains, cewl, comments
+                        Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust
   --proxy_url PROXY_URL, -p PROXY_URL
                         Proxy URL
+  --depth DEPTH, -d DEPTH
+                        Recurse Depth
+  --cookies COOKIES, -c COOKIES
+                        Cookies
   --target_url TARGET_URL [TARGET_URL ...], -t TARGET_URL [TARGET_URL ...]
                         Target URL with paths. Example: http://target.com/path1 and http://target.com/path2 will be "http://target.com path1 path2"
 ```
