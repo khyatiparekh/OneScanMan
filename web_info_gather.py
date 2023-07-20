@@ -243,13 +243,14 @@ def web_recon(url_paths, scans, proxy, args, origin):
     else:
         depth = None
 
-    if args.cookies:
-        try:
-            cookies_dict = dict(x.split('=') for x in args.cookies.split('; '))
-            session.cookies.update(cookies_dict)
-        except Exception as e:
-            print(f"{colors['red']}[Failure][Web Recon][Cookies][{str(e)}]{colors['reset']}")
-            return False
+    if origin != 'main':
+        if args.cookies:
+            try:
+                cookies_dict = dict(x.split('=') for x in args.cookies.split('; '))
+                session.cookies.update(cookies_dict)
+            except Exception as e:
+                print(f"{colors['red']}[Failure][Web Recon][Cookies][{str(e)}]{colors['reset']}")
+                return False
 
     scans = scans[0]
     result = {}
