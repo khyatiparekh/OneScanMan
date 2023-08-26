@@ -65,8 +65,11 @@ def get_server_type(ip_address, port, protocol):
     except RequestException:
         return None
 
-def run_dirsearch(ip_address, port, output_dir, colors):
-    print(f"\n\n\033[1m{colors['yellow']}[>>] Running {colors['cyan']}Dirsearch{colors['reset']}{colors['reset']}\033[0m")
+def run_dirsearch(ip_address, port, output_dir, initiator, colors):
+    if initiator == "web_recon":
+        print(f"\n\n\033[1m{colors['yellow']}[>>] Running {colors['cyan']}Gobuster{colors['reset']}{colors['reset']}\033[0m")
+    else:
+        print(f"\n\n\033[1m{colors['yellow']}[>>] Running {colors['cyan']}Dirsearch{colors['reset']}{colors['reset']}\033[0m")
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -75,6 +78,11 @@ def run_dirsearch(ip_address, port, output_dir, colors):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
         for protocol in protocols:
+            if initiator == "web_recon":
+                output_file = os.path.join(output_dir, f'gobuster_port_{port}_{protocol}.txt')
+
+                run_gobuster(ip_address, port, protocol, output_file, colors)
+                continue
             output_file = os.path.join(output_dir, f'dirsearch_port_{port}_{protocol}.txt')
             os.makedirs(os.path.dirname(output_file), exist_ok=True)
             is_alive = is_website_up(ip_address, port, protocol)
@@ -105,4 +113,3 @@ def run_dirsearch(ip_address, port, output_dir, colors):
                 future.result()
             except Exception as e:
                 synchronized_print(f"{colors['red']}[-] An error occurred while scanning: {e}{colors['reset']}")
-        
