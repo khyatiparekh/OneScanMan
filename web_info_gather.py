@@ -309,43 +309,72 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 result = search_url(url)
                 depth = 10
             if len(params_from_pages) > 0:
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Possible Params][Depth: {str(depth)}]{colors['reset']}\n")
                 for scanned_url in params_from_pages:
+                    print(f"[{colors['cyan']}{scanned_url}{colors['reset']}]\n")
                     for params_in_scanned_urls in params_from_pages[scanned_url]:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Possible Params][Depth: {str(depth)}][{colors['cyan']}{scanned_url}{colors['yellow']}]{colors['reset']}[{colors['red']}URL{colors['reset']}: {params_in_scanned_urls['url']}][{colors['red']}Params{colors['reset']}: {params_in_scanned_urls['params']}]")
-
+                        print(f"[{colors['red']}URL{colors['reset']}: {params_in_scanned_urls['url']}][{colors['red']}Params{colors['reset']}: {params_in_scanned_urls['params']}]")
+                print("\n\n")
             if len(input_vals) > 0:
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][<input>][Depth: {str(depth)}]{colors['reset']}\n")
                 for scanned_url in input_vals:
+                    print(f"[{colors['cyan']}{scanned_url}{colors['reset']}]\n")
                     for inputs_in_scanned_urls in input_vals[scanned_url]:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][<input>][Depth: {str(depth)}][{colors['cyan']}{scanned_url}{colors['yellow']}]{colors['reset']}[{colors['red']}Type{colors['reset']}: {inputs_in_scanned_urls['input_type']}][{colors['red']}Value{colors['reset']}: {inputs_in_scanned_urls['input_value']}][{colors['red']}Name{colors['reset']}: {inputs_in_scanned_urls['input_name']}]")
-
+                        print(f"[{colors['red']}Type{colors['reset']}: {inputs_in_scanned_urls['input_type']}][{colors['red']}Value{colors['reset']}: {inputs_in_scanned_urls['input_value']}][{colors['red']}Name{colors['reset']}: {inputs_in_scanned_urls['input_name']}]")
+                print("\n")
         for path in paths:
             url_path = urljoin(url, path)
             output = {}
 
             if "cookies" in scans or "all" in scans:
                 cookies = fetch_cookies(url_path)
-                for cookie in cookies:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Cookies][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{cookie}]")
+                if len(cookies) > 0:
+                    all_cookies = ""
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Cookies][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n\n")
+                    for cookie in cookies:
+                        print(cookie)
+                    print("\n")
             if "links" in scans or "all" in scans:
                 output["links"] = list(get_links(url_path))
                 if len(output["links"]) > 0:
                     alinks = output["links"] + all_links
                     alinks = list(set(alinks))
+                    all_links_str = ""
                     for links in alinks:
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{links}]")
+                        if not links.startswith('http'):
+                            links = urljoin(url, links)
+                        all_links_str += links.strip() + "\n"
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][links][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n\n")
+                    print(all_links_str)
+                    print("\n")
             if "domains" in scans or "all" in scans:
                 emails, domains = fetch_email_and_domain(url_path)
-                for email in emails:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}[{email}]")
-                for domain in domains:
-                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['reset']}][{domain}]")
+
+                if len(emails) > 0:
+                    all_emails = ""
+                    for email in emails:
+                        all_emails += email.strip() + "\n"
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Email][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}\n\n")
+                    print(all_emails)
+                    print("\n")
+                if len(domains) > 0:
+                    all_domains = ""
+                    for domain in domains:
+                        all_domains += domain.strip() + "\n"
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][subdomain/vhosts][Domains][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['reset']}]\n\n")
+                    print(all_domains)
+                    print("\n")
             if "comments" in scans or "all" in scans:
                 output["comments"] = list(fetch_comments(url_path))
+                all_comments = ""
                 if len(output["comments"]) > 0:
                     for comments in output["comments"]:
                         if isinstance(comments, str):
                             comments = comments.strip()
-                        print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}\n{comments}")
+                        all_comments += comments.strip() + "\n"
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Comments][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}]{colors['reset']}\n\n")
+                    print(all_comments)
+                    print("\n")
             if "banner" in scans or "all" in scans:
                 result = urlparse(url)
 
@@ -376,9 +405,9 @@ def web_recon(url_paths, scans, proxy, args, origin):
                     print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{banner}]")
 
             if "cewl" in scans or "all" in scans:
-                print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}")
-                output["cewl_output"] = run_cewl(url_path, ip, path)                    
-        
+                print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}\n\n")
+                output["cewl_output"] = run_cewl(url_path, ip, path)
+
         if 'dirbust' in scans or 'all' in scans:
             result = urlparse(url)
 
@@ -407,4 +436,4 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 url = url.replace('https://','')
             
             output_dir = "./Reports/" + url 
-            run_dirsearch(url, port, output_dir, colors)
+            run_dirsearch(url, port, output_dir, "web_recon", colors)
