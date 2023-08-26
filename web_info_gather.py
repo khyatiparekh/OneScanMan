@@ -255,19 +255,27 @@ def web_recon(url_paths, scans, proxy, args, origin):
     scans = scans[0]
     result = {}
     for item in url_paths:
+        item = item.strip()
         # If protocol not provided, assume its http
-        if item.strip().startswith("http") == False:
+        if not item.startswith("http"):
             item = "http://" + item
 
-        matches = re.match(r'(https?://[^/\s]+)(?:\s+(.*))?', item)
+        # Use regex to capture URL and optional paths
+        matches = re.match(r'(https?://[^/\s]+)(?:[\/\s]*(.*))?', item)
         if matches:
-            url = matches.group(1)
+            url = matches.group(1).rstrip('/')  # Remove trailing slash if any
             paths = matches.group(2)
             if paths:
-                paths = paths.split()
+                # split based on space but remove empty strings
+                paths = [p for p in paths.split(' ') if p]
             else:
                 paths = []
-            result[url] = result.get(url, []) + paths
+            
+            # Extend the paths list or initialize it if it doesn't exist
+            if url in result:
+                result[url].extend(paths)
+            else:
+                result[url] = paths
 
     for url in result:
         print(f"{colors['yellow']}[Web Recon][{colors['cyan']}{url}{colors['yellow']}]{colors['reset']}")
@@ -309,14 +317,14 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 result = search_url(url)
                 depth = 10
             if len(params_from_pages) > 0:
-                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Possible Params][Depth: {str(depth)}]{colors['reset']}\n")
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Possible Params][Depth: {str(depth)}]{colors['reset']}\n\n")
                 for scanned_url in params_from_pages:
                     print(f"[{colors['cyan']}{scanned_url}{colors['reset']}]\n")
                     for params_in_scanned_urls in params_from_pages[scanned_url]:
                         print(f"[{colors['red']}URL{colors['reset']}: {params_in_scanned_urls['url']}][{colors['red']}Params{colors['reset']}: {params_in_scanned_urls['params']}]")
                 print("\n\n")
             if len(input_vals) > 0:
-                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][<input>][Depth: {str(depth)}]{colors['reset']}\n")
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][<input>][Depth: {str(depth)}]{colors['reset']}\n\n")
                 for scanned_url in input_vals:
                     print(f"[{colors['cyan']}{scanned_url}{colors['reset']}]\n")
                     for inputs_in_scanned_urls in input_vals[scanned_url]:
