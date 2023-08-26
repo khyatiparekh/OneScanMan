@@ -108,7 +108,7 @@ def scan_services(ip_address, service_to_port_map, output_dir, colors, args):
                     web_recon(['https://'+ip_address+':'+str(port)], ['banner,comments,domains,links,files,params'], None, args, "main")
             for port in service_to_port_map[service]:
                 synchronized_print(f"\n\n{colors['yellow']}\033[1m\n[--------] Scanning port: {port} [--------]{colors['reset']}\033[0m")
-                run_dirsearch(ip_address, port, output_dir, colors)
+                run_dirsearch(ip_address, port, output_dir, "enum", colors)
 
 def main(scan_type, args):
     output_dir = "./Reports/" + str(args.output_dir)
