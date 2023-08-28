@@ -81,8 +81,9 @@ Web Recon
    - Extract Domains
    - Extract Comments
    - Discover Banner
-   - Run Dirsearch
+   - Run Gobuster
    - Run cewl to create wordlist from webpage
+   - Run nmap known http recon scripts
 ```
 usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] [--proxy_url PROXY_URL] [--depth DEPTH] [--cookies COOKIES] --target_url TARGET_URL [TARGET_URL ...]
 
