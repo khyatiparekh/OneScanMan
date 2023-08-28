@@ -238,7 +238,7 @@ if __name__ == "__main__":
     enum_parser.add_argument('--interface', '-i', required=True, type=str, help='Interface to use for scanning')
 
     web_recon_parser = subparsers.add_parser('web_recon', help='Perform web reconnaissance')
-    web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust')
+    web_recon_parser.add_argument('--scan_type', '-s', required=True, type=str, nargs='+', help='Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust, nmap')
     web_recon_parser.add_argument('--proxy_url', '-p', type=str, help='Proxy URL')
     web_recon_parser.add_argument('--depth', '-d', type=str, help='Recurse Depth')
     web_recon_parser.add_argument('--cookies', '-c', type=str, help='Cookies')
