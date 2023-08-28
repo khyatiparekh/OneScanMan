@@ -416,6 +416,20 @@ def web_recon(url_paths, scans, proxy, args, origin):
                 print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}\n\n")
                 output["cewl_output"] = run_cewl(url_path, ip, path)
 
+        if 'nmap' in scans or 'all' in scans:
+            result = urlparse(url)
+            scheme = result.scheme
+            netloc = result.netloc
+            if ':' in netloc:
+                domain, port = netloc.split(':')
+            else:
+                domain = netloc
+                port = '80' if scheme == 'http' else '443'
+    
+            print(domain, port)
+ 
+            os.system(f"nmap {domain} -p{port} --script=http-auth-finder,http-auth,http-comments-displayer,http-cookie-flags,http-cors,http-cross-domain-policy,http-csrf,http-devframework,http-errors,http-exif-spider,http-favicon,http-feed,http-fetch,http-generator,http-git,http-headers,http-internal-ip-disclosure,http-ls,http-methods,http-method-tamper,http-ntlm-info,http-php-version,http-referer-checker,http-robots.txt,http-security-headers,http-server-header,http-title,http-trace,http-unsafe-output-escaping,http-useragent-tester,http-userdir-enum,http-vhosts")
+
         if 'dirbust' in scans or 'all' in scans:
             result = urlparse(url)
 
