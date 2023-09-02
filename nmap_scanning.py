@@ -151,14 +151,14 @@ def get_service_to_port_map(ip_address, open_ports, colors):
     unknown_protocols = [f"{protocol} for port {port}" for port, protocol in open_ports.items() if protocol not in ["tcp", "udp"]]
 
     if tcp_ports:
-        arguments = "-sV -sT"
+        arguments = "-sV -sT -Pn"
         command = f"sudo nmap {ip_address} -p {','.join(tcp_ports)} {arguments}"
         print(f"\033[1m{colors['yellow']}[Discover Services][{colors['cyan']}nmap{colors['yellow']}]\033[1m{colors['yellow']}[TCP]{colors['reset']}\033[0m\033[0m")
         nm.scan(ip_address, ','.join(tcp_ports), arguments=arguments)
         service_to_port_map, service_banners = collect_services(nm, service_to_port_map, service_banners)
 
     if udp_ports:
-        arguments = "-sV -sU"
+        arguments = "-sV -sU -Pn"
         command = f"sudo nmap {ip_address} -p {','.join(udp_ports)} {arguments}"
         print(f"\033[1m{colors['yellow']}[Discover Services][{colors['cyan']}nmap{colors['yellow']}]\033[0m\033[1m{colors['yellow']}[UDP]{colors['reset']}\033[0m")
         nm.scan(ip_address, ','.join(udp_ports), arguments=arguments)
