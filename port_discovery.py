@@ -26,9 +26,9 @@ def parse_nmap_output(output):
     return open_ports
 
 def run_nmap(ip_address, output_file, scan_type, colors, timeout=2000):
-    command = [f"sudo nmap -p- -sU --min-rate 1000 --open -T4 {ip_address} -oN {output_file}_udp", 
-                f"sudo nmap -p- -sS --min-rate 1000 --open -T4 {ip_address} -oN {output_file}_tcp",
-                f"sudo nmap -O {ip_address} -oN {output_file}_os"]
+    command = [f"sudo nmap -p- -Pn -sU --min-rate 1000 --open -T4 {ip_address} -oN {output_file}_udp", 
+                f"sudo nmap -p- -Pn -sS --min-rate 1000 --open -T4 {ip_address} -oN {output_file}_tcp",
+                f"sudo nmap -Pn -O {ip_address} -oN {output_file}_os"]
 
     scan_type_u = scan_type.upper()
     if scan_type == "tcp":
