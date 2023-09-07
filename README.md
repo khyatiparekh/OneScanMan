@@ -90,7 +90,7 @@ usage: one_scan_man.py web_recon [-h] --scan_type SCAN_TYPE [SCAN_TYPE ...] [--p
 options:
   -h, --help            show this help message and exit
   --scan_type SCAN_TYPE [SCAN_TYPE ...], -s SCAN_TYPE [SCAN_TYPE ...]
-                        Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust
+                        Type of scan to perform: All, files, params, cookies, links, domains, cewl, comments, banner, dirbust, nmap
   --proxy_url PROXY_URL, -p PROXY_URL
                         Proxy URL
   --depth DEPTH, -d DEPTH
