@@ -229,6 +229,14 @@ def fetch_cookies(url):
         return False
     return res.cookies
 
+# Fetch Response Output Text
+def fetch_http_content(url):
+    try:
+        res = session.get(url)
+    except Exception as e:
+        return False
+    return res.text
+
 # Function to get the IP from the URL
 def get_ip_from_url(url):
     hostname = urlparse(url).hostname
@@ -408,13 +416,22 @@ def web_recon(url_paths, scans, proxy, args, origin):
 
                 services = {port:scheme}
                 banner_result = banner_grabbing(ip, port, colors, services)
+                print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n")
 
                 for banner in banner_result:
-                    print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}[{banner}]")
-
+                    print(banner)
+                    print("\n")
             if "cewl" in scans or "all" in scans:
                 print(f"{colors['yellow']}[Web Recon][Word List]{colors['reset']}\n\n")
                 output["cewl_output"] = run_cewl(url_path, ip, path)
+            if "http-output" in scans:
+                http_output = fetch_http_content(url_path)
+                if len(http_output) > 0:
+                    all_cookies = ""
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][HTTP-Output][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n\n")
+                    print(http_output)
+                    print("\n")
+
 
         if 'nmap' in scans or 'all' in scans:
             print(f"\n\n{colors['yellow']}[Web Recon][{colors['cyan']}nmap-scripts{colors['reset']}{colors['yellow']}]{colors['reset']}\n")        
