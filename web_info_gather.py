@@ -416,7 +416,7 @@ def web_recon(url_paths, scans, proxy, args, origin):
 
                 services = {port:scheme}
                 banner_result = banner_grabbing(ip, port, colors, services)
-                print(f"{colors['yellow']}[Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n")
+                print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Banner][{colors['cyan']}http.client/netcat{colors['reset']}{colors['yellow']}][{colors['cyan']}{url}{colors['yellow']}][Path:{colors['cyan']}{path}{colors['yellow']}]{colors['reset']}\n")
 
                 for banner in banner_result:
                     print(banner)
