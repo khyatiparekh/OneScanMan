@@ -38,11 +38,11 @@ def get_http_headers(ip_address, port, service):
         for header in headers:
             if "server" in header[0].lower():
                 if (isinstance(headers, list)):
-                    print(f"{colors['yellow']}[Web Recon][Headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}\n")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}\n")
                     for header_info in headers:
                         print(header_info)
                 else:
-                    print(f"{colors['yellow']}[Web Recon][Headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}\n")
+                    print(f"{colors['yellow']}[{colors['green']}Discovery{colors['yellow']}][Web Recon][Headers][{colors['cyan']}http.client{colors['reset']}{colors['yellow']}][{colors['cyan']}{ip_address}:{port}{colors['yellow']}]{colors['reset']}\n")
                     print(headers)
                 print("\n")
                 return (header[1],)
