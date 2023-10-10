@@ -92,17 +92,17 @@ def run_dirsearch(ip_address, port, output_dir, initiator, colors):
 
                 # Customize extensions based on server type
                 if server and "apache" in server.lower() or "nginx" in server.lower():
-                    extensions = "js,txt,html,php,php3,php4,php5,php7,phtml"
+                    extensions = "js,txt,html,php,php3,php4,php5,php7,phtml,sh,pl,cgi"
                 elif server and "iis" in server.lower():
-                    extensions = "js,txt,html,cs,dll,config,cshtml,asp,net,asax,aspx,ascx,ashx,asmx,axd,asp"
+                    extensions = "js,txt,html,cs,dll,config,cshtml,asp,net,asax,aspx,ascx,ashx,asmx,axd,asp,sh,pl,cgi"
                 elif server and "python" in server.lower():
-                    extensions = "js,txt,html,py,pyc,pyo,pyd,wsgi,log,xml,json,conf,inc,sql,bak"
+                    extensions = "js,txt,html,py,pyc,pyo,pyd,wsgi,log,xml,json,conf,inc,sql,bak,sh,pl,cgi"
                 elif server and "ruby" in server.lower():
-                    extensions = "js,txt,html,rb,erb,rhtml,rake,rails,log,xml,json,conf,inc,sql,bak,yml,gem"                    
+                    extensions = "js,txt,html,rb,erb,rhtml,rake,rails,log,xml,json,conf,inc,sql,bak,yml,gem,sh,pl,cgi"                    
                 elif server and "node" in server.lower():
-                    extensions = "js,txt,html,json,ejs,jade,log,conf,inc,sql,bak,md,yml"
+                    extensions = "js,txt,html,json,ejs,jade,log,conf,inc,sql,bak,md,yml,cgi,pl,sh"
                 else:
-                    extensions = "php,html,js,txt,html,cs,dll,config,cshtml,asp,net,asax,aspx,ascx,ashx,asmx,axd,asp"
+                    extensions = "php,html,js,txt,html,cs,dll,config,cshtml,asp,net,asax,aspx,ascx,ashx,asmx,axd,asp,sh,pl,cgi"
 
                 futures.append(executor.submit(dirsearch_scan, ip_address, port, protocol, output_file, colors, extensions))
             else:
