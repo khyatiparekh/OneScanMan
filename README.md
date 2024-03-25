@@ -1,4 +1,6 @@
 # OneScanMan
+Contributors: Vishal-Bedi
+
 All it takes is one normal scan. (Initial network enumeration and web recon script for CTFs. Created with HTB, OSCP, and OSWA in mind.)
 
 ![main-qimg-53c69fa4bdd51f447dce1f43a4522ade-lq](https://github.com/khyatiparekh/OneScanMan/assets/3457866/3735b8e0-bcbd-474f-8976-4832425ea420)
